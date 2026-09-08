@@ -28,11 +28,6 @@
     iconClose.classList.add('hidden');
   }));
 
-  // hero entrance reveal
-  document.querySelectorAll('[data-reveal]').forEach((el, i) => {
-    requestAnimationFrame(() => setTimeout(() => el.classList.add('in'), 80 + i * 90));
-  });
-
   // dialect chip selection
   document.querySelectorAll('[data-chip]').forEach(chip => {
     chip.addEventListener('click', () => {
@@ -57,3 +52,134 @@
     track.style.backgroundColor = online ? '#1F2421' : 'rgba(255,248,211,0.2)';
     track.style.boxShadow = online ? 'inset 0 0 0 1px rgba(255,248,211,0.4)' : 'none';
   });
+  // Auth Toggle Button Handler
+ authNavBtn = document.getElementById('authNavBtn');
+
+if (authNavBtn) {
+  function updateAuthButton() {
+    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+
+    if (isLoggedIn) {
+      authNavBtn.textContent = 'Logout';
+      authNavBtn.onclick = handleLogout;
+    } else {
+      authNavBtn.textContent = 'Login';
+      authNavBtn.onclick = handleLogin;
+    }
+  }
+
+  function handleLogin() {
+    window.location.href = '../login%20page/login.html';
+  }
+
+  function handleLogout() {
+    localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    updateAuthButton();
+  }
+
+  // Check state when page loads
+  updateAuthButton();
+}
+// Authentication Button Toggle & Logout Logic
+/*const API_BASE_URL = 'https://edu-essence.onrender.com';
+const authNavBtn = document.getElementById('authNavBtn');
+
+if (authNavBtn) {
+  function updateAuthButton() {
+    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+
+    if (isLoggedIn) {
+      authNavBtn.textContent = 'Logout';
+      authNavBtn.onclick = handleLogout;
+    } else {
+      authNavBtn.textContent = 'Login';
+      authNavBtn.onclick = handleLogin;
+    }
+  }
+
+  function handleLogin() {
+    window.location.href = '../login%20page/login.html';
+  }
+
+  async function handleLogout() {
+    const refreshToken = localStorage.getItem('refresh_token');
+
+    // Notify backend to blacklist the token
+    if (refreshToken) {
+      try {
+        await fetch(`${API_BASE_URL}/api/auth/logout/`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ refresh: refreshToken }),
+        });
+      } catch (err) {
+        // Continue clearing local storage if network request fails
+      }
+    }
+
+    // Clear saved session
+    localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+
+    // Update UI immediately
+    updateAuthButton();
+  }
+
+  // Check state on page load
+  updateAuthButton();
+}*/
+document.addEventListener('DOMContentLoaded', () => {
+  const authNavBtn = document.getElementById('authNavBtn');
+
+  if (!authNavBtn) {
+    console.warn('authNavBtn not found on page');
+    return;
+  }
+
+  function updateAuthButton() {
+    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+
+    if (isLoggedIn) {
+      authNavBtn.textContent = 'Logout';
+      authNavBtn.onclick = handleLogout;
+    } else {
+      authNavBtn.textContent = 'Login';
+      authNavBtn.onclick = handleLogin;
+    }
+  }
+
+  function handleLogin() {
+    window.location.href = '../login page/login.html';
+  }
+
+  async function handleLogout() {
+    const refreshToken = localStorage.getItem('refresh_token');
+
+    if (refreshToken) {
+      try {
+        await fetch('https://edu-essence.onrender.com/api/auth/logout/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ refresh: refreshToken }),
+        });
+      } catch (err) {
+        // Continue clearing session even if logout API is unreachable
+      }
+    }
+
+    localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+
+    updateAuthButton();
+  }
+
+  updateAuthButton();
+});

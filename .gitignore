@@ -1,0 +1,14 @@
+__pycache__/
+*.py[cod]
+*.sqlite3
+.env
+venv/
+.venv/
+media/
+staticfiles/
+.idea/
+.vscode/
+
+# local test artefacts
+EduEssence-openapi.yaml
+sample_teacher_english.mp3
