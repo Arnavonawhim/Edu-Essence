@@ -160,3 +160,46 @@ document.addEventListener('DOMContentLoaded', () => {
   window.syncAuthButton = updateAuthButton;
   updateAuthButton();
 });
+// Real-Time Translator Click Popup Logic
+document.addEventListener('DOMContentLoaded', () => {
+  const translatorBtn = document.getElementById('translatorBtn');
+  const translatorPopup = document.getElementById('translatorPopup');
+  const translatorChevron = document.getElementById('translatorChevron');
+  const translatorWrapper = document.getElementById('translatorWrapper');
+
+  if (translatorBtn && translatorPopup) {
+    // Toggle popup visibility on click
+    translatorBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isHidden = translatorPopup.classList.contains('hidden');
+
+      if (isHidden) {
+        translatorPopup.classList.remove('hidden');
+        if (translatorChevron) translatorChevron.style.transform = 'rotate(180deg)';
+      } else {
+        translatorPopup.classList.add('hidden');
+        if (translatorChevron) translatorChevron.style.transform = 'rotate(0deg)';
+      }
+    });
+
+    // Close popup if clicking anywhere outside the button/card
+    document.addEventListener('click', (e) => {
+      if (!translatorWrapper.contains(e.target)) {
+        translatorPopup.classList.add('hidden');
+        if (translatorChevron) translatorChevron.style.transform = 'rotate(0deg)';
+      }
+    });
+  }
+});
+
+// Mode Selection Handler
+function selectMode(mode) {
+  const popup = document.getElementById('translatorPopup');
+  const chevron = document.getElementById('translatorChevron');
+  
+  if (popup) popup.classList.add('hidden');
+  if (chevron) chevron.style.transform = 'rotate(0deg)';
+
+  // Action based on selected mode
+  alert(`Selected: ${mode} Mode`);
+}

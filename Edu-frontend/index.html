@@ -96,15 +96,36 @@
         An AI-powered vernacular pedagogy and real-time translation tool designed to make primary foundational learning accessible, inclusive, and natural.
       </p>
 
-      <div class="mt-10 flex flex-wrap items-center gap-4" data-stagger>
-        <a href="#tutor" class="btn-primary focus-ring">
-          3D Human Teacher
-          <svg width="15" height="12" viewBox="0 0 15 12" fill="none"><path d="M1 6h12.5M8.5 1l5 5-5 5" stroke="#FFF8D3" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </a>
-        <a href="#modes" class="btn-ghost focus-ring">
-          Real-Time Translator
-        </a>
-      </div>
+      <!-- Buttons Container -->
+<div class="flex items-center gap-4 relative z-30">
+  <!-- 3D Human Teacher (Static button, no auto-scroll jump) -->
+  <button type="button" id="teacherBtn" class="bg-[#1F1B24] text-white px-6 py-3 rounded-full font-medium text-sm transition hover:opacity-90 flex items-center gap-2">
+    3D Human Teacher
+    <span>&rarr;</span>
+  </button>
+
+  <!-- Real-Time Translator (Click trigger popup) -->
+  <div class="relative inline-block" id="translatorWrapper">
+    <button type="button" id="translatorBtn" class="border border-[#1F1B24] text-[#1F1B24] px-6 py-3 rounded-full font-medium text-sm transition hover:bg-black/5 flex items-center gap-2">
+      Real-Time Translator
+      <svg id="translatorChevron" xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+      </svg>
+    </button>
+
+    <!-- Click Popup Modal / Card -->
+    <div id="translatorPopup" class="hidden absolute left-1/2 -translate-x-1/2 top-full mt-2 w-52 bg-white border border-[#C7B4D8] rounded-2xl shadow-xl p-2 z-50 transition-all duration-150">
+      <button type="button" onclick="selectMode('Online')" class="w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-[#FFF8D3] transition text-sm font-medium text-[#1F1B24]">
+        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+        Online Mode
+      </button>
+      <button type="button" onclick="selectMode('Offline')" class="w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-[#FFF8D3] transition text-sm font-medium text-[#1F1B24]">
+        <span class="w-2.5 h-2.5 rounded-full bg-stone-400"></span>
+        Offline Mode
+      </button>
+    </div>
+  </div>
+</div>
 
       <div class="mt-12 flex items-center gap-8 text-sm text-slate/60" data-stagger>
         <div><span class="block font-serif text-2xl text-slate">12+</span>Indian languages</div>
