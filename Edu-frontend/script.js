@@ -245,7 +245,7 @@ function selectMode(mode) {
 
   if (mode === 'offline') {
     // Redirect directly to your running React App server
-    window.location.href = 'http://localhost:5173/';
+    window.location.href = 'http://localhost:5175/';
   } else if (mode === 'online') {
     console.log('Online Mode selected');
   }
@@ -253,7 +253,7 @@ function selectMode(mode) {
 function goToOfflineMode() {
   const token = localStorage.getItem('access_token');
   const targetUrl = token 
-    ? `http://localhost:5175/?token=${encodeURIComponent(token)}` 
-    : 'http://localhost:5175/';
+    ? `http://localhost:5173/?token=${encodeURIComponent(token)}` 
+    : 'http://localhost:5173/';
   window.location.href = targetUrl;
 }
