@@ -30,6 +30,8 @@ export default function App() {
   const [translatedTranscript, setTranslatedTranscript] = useState('');
 
   const recognitionRef = useRef(null);
+  const audioRef = useRef(null);
+  const audioUnlockedRef = useRef(false);
 
   // Helper for authenticated headers
   const getAuthHeaders = () => {
@@ -146,7 +148,14 @@ export default function App() {
   };
 
   // 4. Synthesise Speech / Audio Output (Base64 audio response)
-  const playTranslatedAudio = async (textToSpeak) => {
+    const playTranslatedAudio = async (textToSpeak) => {
+    // Stop anything currently playing before starting new audio
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+    window.speechSynthesis?.cancel();
+
     try {
       const res = await fetch(`${API_BASE_URL}/api/translation/speech/`, {
         method: 'POST',
@@ -159,17 +168,37 @@ export default function App() {
 
       if (res.ok) {
         const data = await res.json();
+        let audioSrc = null;
+
         if (data.audio_base64) {
-          const format = data.audio_format || 'mp3';
-          const audio = new Audio(`data:audio/${format};base64,${data.audio_base64}`);
-          audio.play();
+          // audio_format may already include "audio/" prefix (e.g. "audio/mpeg"),
+          // or just the short form (e.g. "mp3") — handle both safely.
+          const rawFormat = data.audio_format || 'mp3';
+          const mimeType = rawFormat.includes('/') ? rawFormat : `audio/${rawFormat}`;
+          audioSrc = `data:${mimeType};base64,${data.audio_base64}`;
+        } else if (data.audio_url) {
+          audioSrc = data.audio_url;
+        }
+
+        if (audioSrc) {
+          const audio = new Audio(audioSrc);
+          audioRef.current = audio;
+          if (isSpeakerMuted) return; // speaker turned off before audio was ready
+          audio.play().catch((err) => {
+            console.warn('Autoplay blocked, falling back to browser speech:', err);
+            speakWithBrowserVoice(textToSpeak);
+          });
           return;
         }
       }
     } catch (err) {
-      // Web Speech fallback
+      console.warn('Speech API failed, using browser voice fallback:', err);
     }
 
+    speakWithBrowserVoice(textToSpeak);
+  };
+
+  const speakWithBrowserVoice = (textToSpeak) => {
     if ('speechSynthesis' in window && !isSpeakerMuted) {
       window.speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(textToSpeak);
@@ -229,9 +258,14 @@ export default function App() {
   }, [selectedLanguage, isSpeakerMuted]);
 
   // Handle Mute Button toggle
-  const toggleMic = () => {
+    const toggleMic = () => {
     if (isMicMuted) {
       setIsMicMuted(false);
+      if (!audioUnlockedRef.current) {
+        const unlock = new Audio();
+        unlock.play().catch(() => {});
+        audioUnlockedRef.current = true;
+      }
       try {
         recognitionRef.current?.start();
       } catch (_) {}
@@ -244,13 +278,24 @@ export default function App() {
   };
 
   // Handle Speaker Button toggle
-  const toggleSpeaker = () => {
+    const toggleSpeaker = () => {
     if (!isSpeakerMuted) {
+      // Turning speaker OFF — stop everything immediately
       window.speechSynthesis?.cancel();
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+      }
+    } else {
+      // Turning speaker ON — unlock autoplay using this real click
+      if (!audioUnlockedRef.current) {
+        const unlock = new Audio();
+        unlock.play().catch(() => {});
+        audioUnlockedRef.current = true;
+      }
     }
     setIsSpeakerMuted(!isSpeakerMuted);
   };
-
   return (
     <div className="min-h-screen w-full flex flex-col bg-[#EBE1C6] text-[#1F1B24] font-serif selection:bg-[#C7B4D8]">
       {/* Top Navbar */}
