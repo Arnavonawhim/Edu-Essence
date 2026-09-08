@@ -1,5 +1,3 @@
-import Lenis from 'lenis';
-
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 const sections = [...document.querySelectorAll('[data-section]')];
@@ -7,6 +5,13 @@ const tutorWrap = document.getElementById('tutor-wrap');
 const translatorWrap = document.getElementById('translator-wrap');
 const featurePanels = [...document.querySelectorAll('[data-feature]')];
 const featureTabs = [...document.querySelectorAll('[data-feature-tab]')];
+
+let lenis = null;
+let snapTimer;
+let releaseTimer;
+let snapping = false;
+let direction = 0;
+let lastScroll = 0;
 
 sections.forEach(section => {
   section.querySelectorAll('[data-stagger]').forEach((el, i) => el.style.setProperty('--i', i));
@@ -31,32 +36,32 @@ function setFeature(index) {
   });
 }
 
-if (reduceMotion) {
-  sections.forEach(s => s.classList.add('is-active', 'has-entered'));
-  featurePanels.forEach(p => p.classList.add('is-active'));
-} else {
-  setActiveSection(sections[0]);
-  setFeature(0);
-}
+function updateState() {
+  const scroll = window.scrollY;
+  if (scroll !== lastScroll) {
+    direction = scroll > lastScroll ? 1 : -1;
+    lastScroll = scroll;
+  }
+  const viewport = window.innerHeight;
+  const tutorTop = tutorWrap.offsetTop;
+  const translatorTop = translatorWrap.offsetTop;
 
-const lenis = new Lenis({
-  duration: 1.05,
-  easing: t => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-  smoothWheel: !reduceMotion,
-  touchMultiplier: 1.6,
-});
+  if (scroll >= translatorTop - viewport * 0.35) {
+    setActiveSection(sections[2]);
+  } else if (scroll >= tutorTop - viewport * 0.35) {
+    setActiveSection(sections[1]);
+  } else {
+    setActiveSection(sections[0]);
+  }
 
-function raf(time) {
-  lenis.raf(time);
-  requestAnimationFrame(raf);
+  const progress = (scroll - tutorTop) / Math.max(1, tutorWrap.offsetHeight - viewport);
+  setFeature(Math.min(2, Math.max(0, Math.floor(progress * 3 + 0.001))));
 }
-requestAnimationFrame(raf);
 
 /* Snap targets: hero, the three Section-2 feature states, Section 3. */
 function snapTargets() {
-  const viewport = window.innerHeight;
   const tutorTop = tutorWrap.offsetTop;
-  const featureStep = (tutorWrap.offsetHeight - viewport) / 2;
+  const featureStep = (tutorWrap.offsetHeight - window.innerHeight) / 2;
   return [
     0,
     tutorTop,
@@ -68,102 +73,117 @@ function snapTargets() {
 
 let targets = snapTargets();
 
-/* On short viewports a pinned panel can overflow; let it scroll natively. */
-const pinnedPanels = [...document.querySelectorAll('.stack-pin')];
-function syncPinnedOverflow() {
-  pinnedPanels.forEach(panel => {
-    panel.toggleAttribute('data-lenis-prevent', panel.scrollHeight > panel.clientHeight + 1);
-  });
-}
-syncPinnedOverflow();
 const canSnap = () =>
-  !reduceMotion &&
+  lenis &&
   window.innerWidth >= 768 &&
   window.matchMedia('(pointer: fine)').matches;
 
-function updateState(scroll) {
-  const viewport = window.innerHeight;
-
-  const translatorTop = translatorWrap.offsetTop;
-  const tutorTop = tutorWrap.offsetTop;
-  if (scroll >= translatorTop - viewport * 0.35) {
-    setActiveSection(sections[2]);
-  } else if (scroll >= tutorTop - viewport * 0.35) {
-    setActiveSection(sections[1]);
-  } else {
-    setActiveSection(sections[0]);
-  }
-
-  const progress = (scroll - tutorTop) / Math.max(1, tutorWrap.offsetHeight - viewport);
-  const index = Math.min(2, Math.max(0, Math.floor(progress * 3 + 0.001)));
-  setFeature(index);
+function releaseSnap() {
+  clearTimeout(releaseTimer);
+  snapping = false;
 }
 
-let snapTimer;
-let snapping = false;
+function smoothScrollTo(position, duration) {
+  clearTimeout(snapTimer);
+  if (lenis) {
+    snapping = true;
+    clearTimeout(releaseTimer);
+    /* onComplete never fires when the user interrupts the tween, so release regardless. */
+    releaseTimer = setTimeout(releaseSnap, duration * 1000 + 120);
+    lenis.scrollTo(position, {
+      duration,
+      easing: t => 1 - Math.pow(1 - t, 3),
+      onComplete: releaseSnap,
+    });
+  } else {
+    window.scrollTo({ top: position, behavior: 'smooth' });
+  }
+}
 
-function scheduleSnap(scroll) {
+function scheduleSnap() {
   clearTimeout(snapTimer);
   if (!canSnap() || snapping) return;
   snapTimer = setTimeout(() => {
-    const limit = translatorWrap.offsetTop + window.innerHeight * 0.6;
-    if (scroll > limit) return;
+    const scroll = window.scrollY;
+    if (scroll > translatorWrap.offsetTop + window.innerHeight * 0.6) return;
+
     const nearest = targets.reduce((a, b) =>
       Math.abs(b - scroll) < Math.abs(a - scroll) ? b : a
     );
-    if (Math.abs(nearest - scroll) < 2) return;
-    snapping = true;
-    lenis.scrollTo(nearest, {
-      duration: 0.85,
-      easing: t => 1 - Math.pow(1 - t, 3),
-      onComplete: () => { snapping = false; },
-    });
+    /* Snapping backwards against the scroll direction would trap the reader on a
+       state they are trying to leave, so resolve forwards instead. */
+    const ahead = direction > 0
+      ? targets.find(t => t > scroll + 2)
+      : [...targets].reverse().find(t => t < scroll - 2);
+    const target = (direction !== 0 && (nearest - scroll) * direction < 0 && ahead !== undefined)
+      ? ahead
+      : nearest;
+
+    if (Math.abs(target - scroll) < 2) return;
+    smoothScrollTo(target, 0.85);
   }, 130);
 }
 
-lenis.on('scroll', ({ scroll }) => {
-  updateState(scroll);
-  scheduleSnap(scroll);
-});
+function sectionOffset(section) {
+  const wrap = section.closest('.stack-wrap');
+  return wrap ? wrap.offsetTop : section.offsetTop;
+}
 
-updateState(window.scrollY);
+/* Motion is opt-in: without it the page stays a plain, fully visible document. */
+if (!reduceMotion) {
+  document.documentElement.classList.add('js-motion');
+  setActiveSection(sections[0]);
+  setFeature(0);
+  updateState();
 
-let resizeTimer;
-window.addEventListener('resize', () => {
-  clearTimeout(resizeTimer);
-  resizeTimer = setTimeout(() => {
-    targets = snapTargets();
-    syncPinnedOverflow();
-    updateState(lenis.scroll);
-  }, 150);
-});
+  window.addEventListener('scroll', updateState, { passive: true });
 
-document.querySelectorAll('a[href^="#"]').forEach(link => {
-  link.addEventListener('click', event => {
-    const target = document.querySelector(link.getAttribute('href'));
-    if (!target) return;
-    event.preventDefault();
-    clearTimeout(snapTimer);
-    snapping = true;
-    lenis.scrollTo(target === sections[0] ? 0 : target.closest('.stack-wrap') || target, {
-      duration: 1.2,
-      onComplete: () => { snapping = false; },
+  let resizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      targets = snapTargets();
+      updateState();
+    }, 150);
+  });
+
+  document.querySelectorAll('a[href^="#"]').forEach(link => {
+    link.addEventListener('click', event => {
+      const target = document.querySelector(link.getAttribute('href'));
+      if (!target) return;
+      event.preventDefault();
+      smoothScrollTo(target === sections[0] ? 0 : sectionOffset(target), 1.2);
     });
   });
-});
 
-featureTabs.forEach(tab => {
-  tab.addEventListener('click', () => {
-    const index = Number(tab.dataset.featureTab);
-    if (canSnap()) {
-      clearTimeout(snapTimer);
-      snapping = true;
-      lenis.scrollTo(targets[index + 1], {
-        duration: 0.9,
-        onComplete: () => { snapping = false; },
-      });
-    } else {
-      setFeature(index);
-    }
+  featureTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      const index = Number(tab.dataset.featureTab);
+      if (canSnap()) smoothScrollTo(targets[index + 1], 0.9);
+      else setFeature(index);
+    });
   });
-});
+}
+
+/* Called once Lenis resolves — as an ES module when served, or via the UMD fallback. */
+window.startScrollExperience = function (Lenis) {
+  if (window.scrollExperienceReady || reduceMotion || typeof Lenis !== 'function') return;
+  window.scrollExperienceReady = true;
+
+  lenis = new Lenis({
+    duration: 1.05,
+    easing: t => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+    touchMultiplier: 1.6,
+  });
+
+  function raf(time) {
+    lenis.raf(time);
+    requestAnimationFrame(raf);
+  }
+  requestAnimationFrame(raf);
+
+  lenis.on('scroll', () => {
+    updateState();
+    scheduleSnap();
+  });
+};

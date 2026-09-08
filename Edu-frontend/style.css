@@ -99,36 +99,38 @@ html.lenis, html.lenis body { height: auto; }
 }
 
 /* ---------- Sticky stacked-section system ---------- */
+/* Baseline is a plain, fully readable document; `.js-motion` (set by scroll.js)
+   turns on pinning, snapping and the animated states. */
 .stack-wrap { position: relative; }
-#tutor-wrap { height: 300svh; }
-#translator-wrap { height: 120svh; }
+.stack-pin { position: relative; }
 
-.stack-pin {
+.js-motion #tutor-wrap { height: 300svh; }
+.js-motion #translator-wrap { height: 120svh; }
+.js-motion .stack-pin {
   position: sticky;
   top: 0;
   height: 100svh;
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
-  overscroll-behavior: contain;
+  overflow: hidden;
 }
-.stack-pin > * { margin-block: auto; }
+.js-motion .stack-pin > * { margin-block: auto; }
 
-.section-panel > * {
+.js-motion .section-panel > * {
   transition: opacity 0.6s var(--ease-out), transform 0.6s var(--ease-out), filter 0.6s var(--ease-out);
 }
-.section-panel:not(.is-active) > * {
+.js-motion .section-panel:not(.is-active) > * {
   opacity: 0.5;
   transform: scale(0.985);
   filter: blur(2px);
 }
 
 /* ---------- Entrance stagger ---------- */
-[data-stagger] {
+.js-motion [data-stagger] {
   opacity: 0;
   transform: translateY(18px);
 }
-.has-entered [data-stagger] {
+.js-motion .has-entered [data-stagger] {
   opacity: 1;
   transform: none;
   transition: opacity 0.75s var(--ease-out), transform 0.75s var(--ease-out);
@@ -138,29 +140,15 @@ html.lenis, html.lenis body { height: auto; }
 /* ---------- Section 2 feature states ---------- */
 .feature-stage {
   position: relative;
-  min-height: 250px;
+  display: grid;
+  gap: 0.9rem;
 }
 .feature-panel {
-  position: absolute;
-  inset: 0;
   background: var(--cream);
   border: 1px solid rgba(31, 36, 33, 0.1);
   border-radius: 1.25rem;
   padding: 1.6rem 1.75rem;
-  opacity: 0;
-  transform: translateY(22px) scale(0.98);
-  filter: blur(3px);
-  pointer-events: none;
-  transition: opacity 0.55s var(--ease-out), transform 0.55s var(--ease-out), filter 0.55s var(--ease-out);
 }
-.feature-panel.is-active {
-  opacity: 1;
-  transform: none;
-  filter: none;
-  pointer-events: auto;
-}
-.feature-panel.is-past { transform: translateY(-22px) scale(0.98); }
-
 .feature-index {
   display: inline-block;
   font-family: 'Fraunces', serif;
@@ -170,7 +158,29 @@ html.lenis, html.lenis body { height: auto; }
   margin-bottom: 0.6rem;
 }
 
-.feature-rail {
+.js-motion .feature-stage {
+  display: block;
+  min-height: 250px;
+}
+.js-motion .feature-panel {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transform: translateY(22px) scale(0.98);
+  filter: blur(3px);
+  pointer-events: none;
+  transition: opacity 0.55s var(--ease-out), transform 0.55s var(--ease-out), filter 0.55s var(--ease-out);
+}
+.js-motion .feature-panel.is-active {
+  opacity: 1;
+  transform: none;
+  filter: none;
+  pointer-events: auto;
+}
+.js-motion .feature-panel.is-past { transform: translateY(-22px) scale(0.98); }
+
+.feature-rail { display: none; }
+.js-motion .feature-rail {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
@@ -192,30 +202,30 @@ html.lenis, html.lenis body { height: auto; }
 }
 
 @media (max-width: 640px) {
-  .feature-stage { min-height: 290px; }
   .feature-panel { padding: 1.35rem; }
+  .js-motion .feature-stage { min-height: 290px; }
 }
 
 /* Below md the sections flow naturally instead of pinning. */
 @media (max-width: 767px) {
-  .stack-pin {
+  .js-motion #tutor-wrap,
+  .js-motion #translator-wrap { height: auto; }
+  .js-motion .stack-pin {
     position: relative;
     height: auto;
     overflow: visible;
   }
-  .stack-pin > * { margin-block: 0; }
-  #tutor-wrap, #translator-wrap { height: auto; }
-  .section-panel:not(.is-active) > * {
+  .js-motion .stack-pin > * { margin-block: 0; }
+  .js-motion .section-panel:not(.is-active) > * {
     opacity: 1;
     transform: none;
     filter: none;
   }
-  .feature-stage {
-    min-height: 0;
+  .js-motion .feature-stage {
     display: grid;
-    gap: 0.9rem;
+    min-height: 0;
   }
-  .feature-panel {
+  .js-motion .feature-panel {
     position: relative;
     inset: auto;
     opacity: 1;
@@ -223,7 +233,7 @@ html.lenis, html.lenis body { height: auto; }
     filter: none;
     pointer-events: auto;
   }
-  .feature-rail { display: none; }
+  .js-motion .feature-rail { display: none; }
 }
 
 /* ---------- Decorative motion ---------- */
@@ -251,18 +261,3 @@ html.lenis, html.lenis body { height: auto; }
 .chip { transition: background-color .2s ease, color .2s ease, border-color .2s ease; }
 
 textarea, input { font-family: inherit; }
-
-@media (prefers-reduced-motion: reduce) {
-  [data-stagger],
-  .feature-panel,
-  .section-panel:not(.is-active) > * {
-    opacity: 1 !important;
-    transform: none !important;
-    filter: none !important;
-    transition: none !important;
-  }
-  .feature-panel { position: relative; inset: auto; margin-bottom: 1rem; pointer-events: auto; }
-  .feature-stage { min-height: 0; }
-  .stack-pin { position: relative; height: auto; }
-  #tutor-wrap, #translator-wrap { height: auto; }
-}
