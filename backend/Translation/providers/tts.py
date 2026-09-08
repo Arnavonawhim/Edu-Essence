@@ -5,8 +5,8 @@ import requests
 from django.conf import settings
 from gtts import gTTS, gTTSError
 
-from EduEssence.backend.Translation.languages import provider_code
-from EduEssence.backend.Translation.providers.base import Provider, ProviderError
+from Translation.languages import provider_code
+from Translation.providers.base import Provider, ProviderError
 
 SARVAM_TTS_URL = 'https://api.sarvam.ai/text-to-speech'
 

@@ -5,8 +5,8 @@ from concurrent.futures import ThreadPoolExecutor
 from django.db import transaction
 from django.db.models import Max
 
-from EduEssence.backend.Classroom.models import ClassUtterance, UtteranceTranslation
-from EduEssence.backend.Translation.providers import (
+from Classroom.models import ClassUtterance, UtteranceTranslation
+from Translation.providers import (
     ProviderError,
     speech_to_text,
     text_to_speech,

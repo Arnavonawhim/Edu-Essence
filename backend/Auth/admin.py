@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
-from EduEssence.backend.Auth.models import User
+from Auth.models import User
 
 
 @admin.register(User)

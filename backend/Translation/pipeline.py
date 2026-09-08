@@ -3,8 +3,8 @@ import time
 from django.db import transaction
 from django.db.models import Max
 
-from EduEssence.backend.Translation.models import TranscriptChunk
-from EduEssence.backend.Translation.providers import speech_to_text, text_to_speech, translate_text
+from Translation.models import TranscriptChunk
+from Translation.providers import speech_to_text, text_to_speech, translate_text
 
 
 class EmptyTranscript(Exception):

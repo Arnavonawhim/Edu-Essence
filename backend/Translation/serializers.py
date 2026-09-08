@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
-from EduEssence.backend.Translation.languages import LANGUAGES, is_supported
-from EduEssence.backend.Translation.models import TeachingSession, TranscriptChunk
+from Translation.languages import LANGUAGES, is_supported
+from Translation.models import TeachingSession, TranscriptChunk
 
 
 class LanguageSerializer(serializers.Serializer):

@@ -1,6 +1,6 @@
 from django.urls import path
 
-from EduEssence.backend.Classroom.views import (
+from Classroom.views import (
     ClassDetailView,
     ClassEndView,
     ClassJoinView,

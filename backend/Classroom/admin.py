@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from EduEssence.backend.Classroom.models import (
+from Classroom.models import (
     ClassParticipant,
     ClassUtterance,
     LiveClass,

@@ -1,12 +1,12 @@
 from rest_framework import serializers
 
-from EduEssence.backend.Classroom.models import (
+from Classroom.models import (
     ClassParticipant,
     ClassUtterance,
     LiveClass,
     UtteranceTranslation,
 )
-from EduEssence.backend.Translation.serializers import LanguageCodeField
+from Translation.serializers import LanguageCodeField
 
 
 class ParticipantSerializer(serializers.ModelSerializer):

@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from EduEssence.backend.Translation.models import TeachingSession, TranscriptChunk
+from Translation.models import TeachingSession, TranscriptChunk
 
 
 class TranscriptChunkInline(admin.TabularInline):

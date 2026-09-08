@@ -8,20 +8,20 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from EduEssence.backend.Auth.permissions import IsStudent, IsTeacher
-from EduEssence.backend.Auth.serializers import MessageSerializer
-from EduEssence.backend.Classroom.livekit import (
+from Auth.permissions import IsStudent, IsTeacher
+from Auth.serializers import MessageSerializer
+from Classroom.livekit import (
     LiveKitNotConfigured,
     build_room_name,
     create_access_token,
 )
-from EduEssence.backend.Classroom.models import ClassParticipant, LiveClass, UtteranceTranslation
-from EduEssence.backend.Classroom.pipeline import (
+from Classroom.models import ClassParticipant, LiveClass, UtteranceTranslation
+from Classroom.pipeline import (
     EmptyTranscript,
     NoListeners,
     process_class_utterance,
 )
-from EduEssence.backend.Classroom.serializers import (
+from Classroom.serializers import (
     ClassUtteranceRequestSerializer,
     ClassUtteranceSerializer,
     JoinClassSerializer,
@@ -32,7 +32,7 @@ from EduEssence.backend.Classroom.serializers import (
     RoomTokenSerializer,
     StreamSerializer,
 )
-from EduEssence.backend.Translation.providers import ProviderError
+from Translation.providers import ProviderError
 
 
 def teacher_class(request, class_id):

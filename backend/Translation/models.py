@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.db import models
 
-from EduEssence.backend.Translation.languages import LANGUAGE_CHOICES
+from Translation.languages import LANGUAGE_CHOICES
 
 
 class TeachingSession(models.Model):

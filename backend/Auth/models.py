@@ -3,7 +3,7 @@ from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.db import models
 from django.utils import timezone
 
-from EduEssence.backend.Auth.managers import UserManager
+from Auth.managers import UserManager
 
 
 class User(AbstractBaseUser, PermissionsMixin):

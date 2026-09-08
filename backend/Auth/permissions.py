@@ -1,6 +1,6 @@
 from rest_framework.permissions import BasePermission
 
-from EduEssence.backend.Auth.models import User
+from Auth.models import User
 
 
 class IsTeacher(BasePermission):

@@ -2,10 +2,10 @@ import logging
 
 from django.conf import settings
 
-from EduEssence.backend.Translation.providers.base import ProviderError
-from EduEssence.backend.Translation.providers.stt import GroqSTT, SarvamSTT
-from EduEssence.backend.Translation.providers.translate import GroqTranslator, SarvamTranslator
-from EduEssence.backend.Translation.providers.tts import GoogleTTS, SarvamTTS
+from Translation.providers.base import ProviderError
+from Translation.providers.stt import GroqSTT, SarvamSTT
+from Translation.providers.translate import GroqTranslator, SarvamTranslator
+from Translation.providers.tts import GoogleTTS, SarvamTTS
 
 logger = logging.getLogger(__name__)
 

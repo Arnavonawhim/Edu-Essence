@@ -1,6 +1,6 @@
 from django.urls import path
 
-from EduEssence.backend.Translation.views import (
+from Translation.views import (
     LanguageListView,
     SessionDetailView,
     SessionEndView,

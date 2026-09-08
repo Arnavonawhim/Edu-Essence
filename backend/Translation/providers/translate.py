@@ -1,8 +1,8 @@
 import requests
 from django.conf import settings
 
-from EduEssence.backend.Translation.languages import language_name, provider_code
-from EduEssence.backend.Translation.providers.base import Provider, ProviderError
+from Translation.languages import language_name, provider_code
+from Translation.providers.base import Provider, ProviderError
 
 GROQ_CHAT_URL = 'https://api.groq.com/openai/v1/chat/completions'
 SARVAM_TRANSLATE_URL = 'https://api.sarvam.ai/translate'

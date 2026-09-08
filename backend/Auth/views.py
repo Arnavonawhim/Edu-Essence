@@ -4,7 +4,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from EduEssence.backend.Auth.serializers import (
+from Auth.serializers import (
     AuthResponseSerializer,
     ChangePasswordSerializer,
     LoginSerializer,
@@ -13,7 +13,7 @@ from EduEssence.backend.Auth.serializers import (
     RegisterSerializer,
     UserSerializer,
 )
-from EduEssence.backend.Auth.services import build_token_pair
+from Auth.services import build_token_pair
 
 
 class RegisterView(APIView):

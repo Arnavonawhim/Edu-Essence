@@ -4,7 +4,7 @@ import string
 from django.conf import settings
 from django.db import models
 
-from EduEssence.backend.Translation.languages import LANGUAGE_CHOICES
+from Translation.languages import LANGUAGE_CHOICES
 
 JOIN_CODE_ALPHABET = string.ascii_uppercase + string.digits
 

@@ -7,7 +7,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from EduEssence.backend.Classroom.models import ClassParticipant, ClassUtterance, LiveClass
+from Classroom.models import ClassParticipant, ClassUtterance, LiveClass
 
 User = get_user_model()
 

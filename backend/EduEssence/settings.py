@@ -20,7 +20,10 @@ from dotenv import load_dotenv
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-load_dotenv(BASE_DIR / '.env')
+for _env_file in (BASE_DIR / '.env', BASE_DIR.parent / '.env'):
+    if _env_file.exists():
+        load_dotenv(_env_file)
+        break
 
 
 # Quick-start development settings - unsuitable for production

@@ -8,12 +8,12 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from EduEssence.backend.Auth.serializers import MessageSerializer
-from EduEssence.backend.Translation.languages import LANGUAGES
-from EduEssence.backend.Translation.models import TeachingSession
-from EduEssence.backend.Translation.pipeline import EmptyTranscript, process_utterance
-from EduEssence.backend.Translation.providers import ProviderError, text_to_speech, translate_text
-from EduEssence.backend.Translation.serializers import (
+from Auth.serializers import MessageSerializer
+from Translation.languages import LANGUAGES
+from Translation.models import TeachingSession
+from Translation.pipeline import EmptyTranscript, process_utterance
+from Translation.providers import ProviderError, text_to_speech, translate_text
+from Translation.serializers import (
     LanguageSerializer,
     SpeechRequestSerializer,
     SpeechResponseSerializer,

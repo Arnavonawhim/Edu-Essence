@@ -7,8 +7,8 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from EduEssence.backend.Translation.models import TeachingSession, TranscriptChunk
-from EduEssence.backend.Translation.providers.base import ProviderError
+from Translation.models import TeachingSession, TranscriptChunk
+from Translation.providers.base import ProviderError
 
 User = get_user_model()
 
@@ -179,7 +179,7 @@ class ProviderFallbackTests(TranslationTestCase):
         SARVAM_API_KEY='test-key',
     )
     def test_translation_falls_back_to_the_next_provider(self):
-        from EduEssence.backend.Translation.providers import registry
+        from Translation.providers import registry
 
         with patch.object(
             registry.GroqTranslator, 'translate', side_effect=ProviderError('groq', 'down')
@@ -190,7 +190,7 @@ class ProviderFallbackTests(TranslationTestCase):
         self.assertEqual(provider, 'sarvam')
 
     def test_same_language_skips_the_provider(self):
-        from EduEssence.backend.Translation.providers import registry
+        from Translation.providers import registry
 
         text, provider = registry.translate_text('Hello', 'en', 'en')
 

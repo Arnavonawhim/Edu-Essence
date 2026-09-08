@@ -1,7 +1,7 @@
 from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView, TokenVerifyView
 
-from EduEssence.backend.Auth.views import (
+from Auth.views import (
     ChangePasswordView,
     LoginView,
     LogoutView,
