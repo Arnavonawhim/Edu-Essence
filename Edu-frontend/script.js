@@ -69,7 +69,7 @@ if (authNavBtn) {
   }
 
   function handleLogin() {
-    window.location.href = '../login%20page/login.html';
+    window.openAuthModal?.('login');
   }
 
   function handleLogout() {
@@ -100,7 +100,7 @@ if (authNavBtn) {
   }
 
   function handleLogin() {
-    window.location.href = '../login%20page/login.html';
+    window.openAuthModal?.('login');
   }
 
   async function handleLogout() {
@@ -154,7 +154,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function handleLogin() {
-    window.location.href = '../login page/login.html';
+    window.openAuthModal?.('login');
   }
 
   async function handleLogout() {
@@ -181,5 +181,6 @@ document.addEventListener('DOMContentLoaded', () => {
     updateAuthButton();
   }
 
+  window.syncAuthButton = updateAuthButton;
   updateAuthButton();
 });
