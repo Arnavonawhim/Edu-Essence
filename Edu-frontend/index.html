@@ -1,301 +1,385 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>BhashaShiksha — Learning that speaks your language</title>
-<meta name="description" content="An AI-powered vernacular pedagogy and real-time translation tool for mother-tongue primary education." />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BhashaShiksha — Learning that speaks your language</title>
+  <meta name="description"
+    content="An AI-powered vernacular pedagogy and real-time translation tool for mother-tongue primary education." />
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500;1,9..144,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500;1,9..144,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
 
-<script src="https://cdn.tailwindcss.com"></script>
-<script>
-  tailwind.config = {
-    theme: {
-      extend: {
-        colors: {
-          cream:  '#EBE1C6',
-          lilac:  '#C7B4D8',
-          beam:   '#FFF8D3',
-          slate:  '#1F2421',
-          plum:   '#1E1B24',
-        },
-        fontFamily: {
-          serif: ['Fraunces', 'serif'],
-          sans:  ['"Plus Jakarta Sans"', 'sans-serif'],
-        },
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            cream: '#EBE1C6',
+            lilac: '#C7B4D8',
+            beam: '#FFF8D3',
+            slate: '#1F2421',
+            plum: '#1E1B24',
+          },
+          fontFamily: {
+            serif: ['Fraunces', 'serif'],
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          },
+        }
       }
     }
-  }
-</script>
+  </script>
 
-<link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body class="font-sans text-slate antialiased">
 
-<!-- ============ NAVBAR ============ -->
-<header id="site-header" class="fixed top-0 inset-x-0 z-[60] transition-colors duration-300">
-  <nav class="max-w-7xl mx-auto flex items-center justify-between px-6 md:px-10 py-5">
-    <a href="#top" class="flex items-center gap-2.5 group">
-      <span class="w-9 h-9 rounded-full bg-slate text-beam flex items-center justify-center font-serif text-lg italic">भ</span>
-      <span class="font-serif text-xl tracking-tight">BhashaShiksha</span>
-    </a>
-
-    <div class="hidden md:flex items-center gap-10 text-[15px] font-medium">
-      <a href="#tutor" class="hover:opacity-60 transition-opacity focus-ring rounded">About</a>
-      <a href="#translator" class="hover:opacity-60 transition-opacity focus-ring rounded">Dashboard</a>
-    </div>
-
-    <a href="#top" class="hidden md:inline-flex items-center gap-2 bg-slate text-beam text-sm font-semibold px-5 py-2.5 rounded-full hover:bg-plum transition-colors focus-ring">
-      Get Started
-    </a>
-
-    <button id="menu-btn" class="md:hidden w-10 h-10 flex items-center justify-center rounded-full border border-slate/20 focus-ring" aria-label="Open menu" aria-expanded="false">
-      <svg id="menu-icon-open" width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M1 4h16M1 9h16M1 14h16" stroke="#1F2421" stroke-width="1.6" stroke-linecap="round"/></svg>
-      <svg id="menu-icon-close" width="16" height="16" viewBox="0 0 16 16" fill="none" class="hidden"><path d="M1 1l14 14M15 1L1 15" stroke="#1F2421" stroke-width="1.6" stroke-linecap="round"/></svg>
-    </button>
-  </nav>
-
-  <!-- mobile menu -->
-  <div id="mobile-menu" class="md:hidden hidden bg-beam border-t border-slate/10 px-6 py-6 flex flex-col gap-5 text-base font-medium">
-    <a href="#tutor" class="mobile-link">About</a>
-    <a href="#translator" class="mobile-link">Dashboard</a>
-    <a href="#top" class="inline-flex justify-center bg-slate text-beam text-sm font-semibold px-5 py-3 rounded-full">Get Started</a>
-  </div>
-</header>
-
-<!-- ============ SECTION 1 · HERO ============ -->
-<section id="top" class="relative z-0 min-h-screen pt-32 pb-24 md:pt-40 overflow-hidden">
-  <div class="max-w-7xl mx-auto px-6 md:px-10 grid md:grid-cols-[1.15fr_0.85fr] gap-16 items-center">
-
-    <div class="reveal" data-reveal>
-      <span class="inline-flex items-center gap-2 bg-lilac/50 border border-slate/10 text-[13px] font-semibold tracking-wide px-4 py-1.5 rounded-full">
-        EdTech • Mother-tongue primary education
-      </span>
-
-      <h1 class="font-serif text-[2.6rem] leading-[1.08] sm:text-6xl sm:leading-[1.05] mt-7 max-w-xl">
-        Every child understands best in their mother tongue.
-      </h1>
-
-      <p class="mt-6 text-[17px] leading-relaxed text-slate/75 max-w-[46ch]">
-        An AI-powered vernacular pedagogy and real-time translation tool designed to make primary foundational learning accessible, inclusive, and natural.
-      </p>
-
-      <div class="mt-10 flex flex-wrap items-center gap-4">
-        <a href="#tutor" class="inline-flex items-center gap-2 bg-slate text-beam font-semibold px-6 py-3.5 rounded-full hover:bg-plum transition-colors focus-ring">
-          3D Human Teacher
-          <svg width="15" height="12" viewBox="0 0 15 12" fill="none"><path d="M1 6h12.5M8.5 1l5 5-5 5" stroke="#FFF8D3" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </a>
-        <a href="#translator" class="inline-flex items-center gap-2 border border-slate/30 font-semibold px-6 py-3.5 rounded-full hover:bg-slate hover:text-beam hover:border-slate transition-colors focus-ring">
-          Real-Time Translator
-        </a>
-      </div>
-
-      <div class="mt-14 flex items-center gap-8 text-sm text-slate/60">
-        <div><span class="block font-serif text-2xl text-slate">12+</span>Indian languages</div>
-        <div class="w-px h-9 bg-slate/15"></div>
-        <div><span class="block font-serif text-2xl text-slate">Offline</span>ready for rural classrooms</div>
-      </div>
-    </div>
-
-    <!-- decorative vernacular script cards -->
-    <div class="relative h-[420px] hidden md:block reveal" data-reveal style="transition-delay:.15s">
-      <div class="absolute inset-0 rounded-[2.5rem] bg-lilac/40 -rotate-3"></div>
-
-      <div class="absolute top-6 left-2 w-40 bg-beam rounded-2xl shadow-lg px-5 py-4 float-slow" style="--r:-6deg">
-        <p class="text-[11px] font-semibold text-slate/50">Hindi · नमस्ते</p>
-        <p class="font-serif text-2xl mt-1">Welcome</p>
-      </div>
-
-      <div class="absolute top-24 right-0 w-40 bg-slate text-beam rounded-2xl shadow-lg px-5 py-4 float-slow-rev" style="--r:5deg">
-        <p class="text-[11px] font-semibold text-beam/60">Tamil · வணக்கம்</p>
-        <p class="font-serif text-2xl mt-1">Hello</p>
-      </div>
-
-      <div class="absolute bottom-24 left-8 w-40 bg-beam rounded-2xl shadow-lg px-5 py-4 float-slower" style="--r:-4deg">
-        <p class="text-[11px] font-semibold text-slate/50">Bengali · শেখা</p>
-        <p class="font-serif text-2xl mt-1">Learning</p>
-      </div>
-
-      <div class="absolute bottom-4 right-6 w-40 bg-lilac rounded-2xl shadow-lg px-5 py-4 float-slow" style="--r:6deg; animation-delay:1.2s">
-        <p class="text-[11px] font-semibold text-slate/50">Telugu · పాఠశాల</p>
-        <p class="font-serif text-2xl mt-1">School</p>
-      </div>
-
-      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 rounded-full bg-cream border-4 border-beam shadow-xl flex items-center justify-center">
-        <span class="font-serif italic text-3xl">अ</span>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ============ SECTION 2 · 3D HUMAN TEACHER (sticky pin) ============ -->
-<div class="stack-wrap h-[170vh] md:h-[190vh]">
-  <section id="tutor" class="stack-pin z-20 bg-beam rounded-t-[2.5rem] md:rounded-t-[3.5rem] shadow-[0_-30px_60px_-15px_rgba(31,36,33,0.25)] overflow-y-auto">
-    <div class="max-w-7xl mx-auto px-6 md:px-10 py-16 md:py-24 grid lg:grid-cols-[0.9fr_1.1fr] gap-16 items-center">
-
-      <!-- avatar visual -->
-      <div class="relative mx-auto w-full max-w-sm">
-        <div class="absolute -inset-6 rounded-[2.5rem] bg-lilac/50"></div>
-        <div class="relative bg-cream rounded-[2rem] p-8 aspect-[4/5] flex flex-col items-center justify-end overflow-hidden">
-          <!-- simple friendly avatar, hand-drawn not photoreal -->
-          <svg viewBox="0 0 200 220" class="w-44 h-44 mb-2" aria-hidden="true">
-            <circle cx="100" cy="80" r="52" fill="#1F2421"/>
-            <circle cx="82" cy="78" r="5" fill="#FFF8D3"/>
-            <circle cx="118" cy="78" r="5" fill="#FFF8D3"/>
-            <path d="M78 100q22 16 44 0" stroke="#FFF8D3" stroke-width="4" fill="none" stroke-linecap="round"/>
-            <path d="M40 220v-30c0-33 27-50 60-50s60 17 60 50v30" fill="#C7B4D8"/>
-          </svg>
-          <div class="w-full bg-slate text-beam rounded-2xl px-4 py-3 text-sm relative">
-            <span class="font-medium">“चलो साथ में सीखते हैं!”</span>
-            <span class="block text-beam/60 text-xs mt-0.5">Let's learn together — spoken in the student's dialect</span>
-          </div>
-        </div>
-      </div>
-
-      <div>
-        <span class="inline-flex items-center gap-2 bg-lilac/50 border border-slate/10 text-[13px] font-semibold px-4 py-1.5 rounded-full">
-          AI pedagogy &amp; interactive avatar
-        </span>
-        <h2 class="font-serif text-4xl sm:text-[2.75rem] leading-[1.1] mt-6 max-w-lg">
-          Meet your vernacular 3D AI tutor
-        </h2>
-        <p class="mt-4 text-slate/70 max-w-lg leading-relaxed">
-          A classroom companion that reads, speaks, and reasons in the child's own language — turning static textbooks into a patient, gesturing teacher.
-        </p>
-
-        <div class="mt-10 grid sm:grid-cols-2 gap-5">
-          <div class="bg-cream rounded-2xl p-6 border border-slate/10">
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M12 3v12M12 3l-4 4M12 3l4 4M5 15v3a2 2 0 002 2h10a2 2 0 002-2v-3" stroke="#1F2421" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            <h3 class="font-serif text-lg mt-4">Upload study material</h3>
-            <p class="text-sm text-slate/65 mt-2 leading-relaxed">Drop in textbook pages, syllabus notes, or storybooks — get an instant translated, conversational lesson.</p>
-          </div>
-
-          <div class="bg-cream rounded-2xl p-6 border border-slate/10">
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M9 12l2 2 4-4M12 3l8 4v5c0 5-3.5 8.5-8 9-4.5-.5-8-4-8-9V7l8-4z" stroke="#1F2421" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            <h3 class="font-serif text-lg mt-4">Automated test generator</h3>
-            <p class="text-sm text-slate/65 mt-2 leading-relaxed">Dynamic quizzes, voice-assisted assessments, and multiple-choice questions in the student's regional dialect.</p>
-          </div>
-
-          <div class="bg-cream rounded-2xl p-6 border border-slate/10 sm:col-span-2">
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><rect x="9" y="2" width="6" height="12" rx="3" stroke="#1F2421" stroke-width="1.6"/><path d="M5 11a7 7 0 0014 0M12 18v3m-4 0h8" stroke="#1F2421" stroke-width="1.6" stroke-linecap="round"/></svg>
-            <h3 class="font-serif text-lg mt-4">Voice &amp; text Q&amp;A</h3>
-            <p class="text-sm text-slate/65 mt-2 leading-relaxed">A real-time animated tutor that speaks, gestures, and explains doubts step-by-step with phonetic accuracy — ask by typing or by speaking.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-</div>
-
-<!-- ============ SECTION 3 · REAL-TIME TRANSLATOR (sticky pin, stacks over section 2) ============ -->
-<div class="stack-wrap h-[190vh] md:h-[210vh]">
-  <section id="translator" class="stack-pin z-30 bg-lilac/70 rounded-t-[2.5rem] md:rounded-t-[3.5rem] shadow-[0_-30px_60px_-15px_rgba(31,36,33,0.3)] overflow-y-auto grain">
-    <div class="max-w-7xl mx-auto px-6 md:px-10 py-16 md:py-24">
-
-      <div class="max-w-2xl">
-        <span class="inline-flex items-center gap-2 bg-cream/80 border border-slate/10 text-[13px] font-semibold px-4 py-1.5 rounded-full">
-          Live classroom bridge
-        </span>
-        <h2 class="font-serif text-4xl sm:text-[2.75rem] leading-[1.1] mt-6">
-          Break language barriers in and out of the classroom
-        </h2>
-        <p class="mt-4 text-slate/70 leading-relaxed">
-          A translator built for the realities of Indian classrooms — from patchy village networks to fast-moving city lectures.
-        </p>
-      </div>
-
-      <!-- mode toggle mock -->
-      <div class="mt-12 grid md:grid-cols-2 gap-6">
-        <div class="bg-cream rounded-2xl p-7 border border-slate/10">
-          <div class="flex items-start justify-between">
-            <div>
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M3 3l18 18M8.5 8.5A11 11 0 0121 9M5 9a11 11 0 013 -1.9M12 17a2 2 0 100 4 2 2 0 000-4z" stroke="#1F2421" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              <h3 class="font-serif text-xl mt-3">Offline mode</h3>
-            </div>
-            <span class="text-[11px] font-semibold bg-beam px-2.5 py-1 rounded-full">On-device</span>
-          </div>
-          <p class="text-sm text-slate/65 mt-3 leading-relaxed">Lightweight multilingual models run directly on low-cost devices, so rural classrooms with zero or weak connectivity can still translate and learn seamlessly.</p>
-        </div>
-
-        <div class="bg-cream rounded-2xl p-7 border border-slate/10">
-          <div class="flex items-start justify-between">
-            <div>
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M7 18a4.5 4.5 0 01-.4-8.98A5.5 5.5 0 0117 8a4 4 0 010 8H7z" stroke="#1F2421" stroke-width="1.6" stroke-linejoin="round"/></svg>
-              <h3 class="font-serif text-xl mt-3">Online mode</h3>
-            </div>
-            <span class="text-[11px] font-semibold bg-beam px-2.5 py-1 rounded-full">Cloud-powered</span>
-          </div>
-          <p class="text-sm text-slate/65 mt-3 leading-relaxed">Live audio streaming translates lectures as they happen, with synchronized multilingual transcriptions for every student in the room.</p>
-        </div>
-      </div>
-
-      <!-- interactive mock: dialect switcher + toggle -->
-      <div class="mt-8 bg-slate text-beam rounded-2xl p-7 flex flex-col md:flex-row md:items-center gap-6 justify-between">
-        <div>
-          <p class="text-sm text-beam/60">Try switching the classroom dialect</p>
-          <div id="dialect-chips" class="flex flex-wrap gap-2 mt-3">
-            <button data-chip class="chip text-sm font-medium px-4 py-1.5 rounded-full bg-beam text-slate">Hindi</button>
-            <button data-chip class="chip text-sm font-medium px-4 py-1.5 rounded-full border border-beam/30 hover:bg-beam/10">Tamil</button>
-            <button data-chip class="chip text-sm font-medium px-4 py-1.5 rounded-full border border-beam/30 hover:bg-beam/10">Bengali</button>
-            <button data-chip class="chip text-sm font-medium px-4 py-1.5 rounded-full border border-beam/30 hover:bg-beam/10">Telugu</button>
-            <button data-chip class="chip text-sm font-medium px-4 py-1.5 rounded-full border border-beam/30 hover:bg-beam/10">Marathi</button>
-          </div>
-        </div>
-
-        <button id="mode-toggle" class="flex items-center gap-3 self-start md:self-auto" aria-pressed="false">
-          <span class="text-sm font-medium">Offline</span>
-          <span id="switch-track" class="switch-track w-12 h-7 rounded-full bg-beam/20 relative">
-            <span id="switch-dot" class="switch-dot absolute top-1 left-1 w-5 h-5 rounded-full bg-beam"></span>
-          </span>
-          <span class="text-sm font-medium text-beam/50">Online</span>
-        </button>
-      </div>
-
-      <!-- extra features -->
-      <div class="mt-8 grid sm:grid-cols-3 gap-5">
-        <div class="bg-cream/70 rounded-2xl p-6 border border-slate/10">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M11 5L6 9H2v6h4l5 4V5z" stroke="#1F2421" stroke-width="1.6" stroke-linejoin="round"/><path d="M16 8.5a5 5 0 010 7" stroke="#1F2421" stroke-width="1.6" stroke-linecap="round"/></svg>
-          <h3 class="font-serif text-lg mt-3">Pronunciation correction</h3>
-          <p class="text-sm text-slate/65 mt-2 leading-relaxed">Instant voice feedback helps students refine vernacular pronunciation as they speak.</p>
-        </div>
-        <div class="bg-cream/70 rounded-2xl p-6 border border-slate/10">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="14" rx="2" stroke="#1F2421" stroke-width="1.6"/><path d="M3 15l5-5 4 4 4-3 5 4" stroke="#1F2421" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          <h3 class="font-serif text-lg mt-3">Picture-to-vernacular cards</h3>
-          <p class="text-sm text-slate/65 mt-2 leading-relaxed">Visual vocabulary cards pair everyday images with their word in the child's language.</p>
-        </div>
-        <div class="bg-cream/70 rounded-2xl p-6 border border-slate/10">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#1F2421" stroke-width="1.6"/><path d="M3 12h18M12 3a13 13 0 010 18M12 3a13 13 0 000 18" stroke="#1F2421" stroke-width="1.6"/></svg>
-          <h3 class="font-serif text-lg mt-3">Multi-dialect switching</h3>
-          <p class="text-sm text-slate/65 mt-2 leading-relaxed">Move between Hindi, Tamil, Bengali, Telugu, Marathi, and more, mid-lesson.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-</div>
-
-<!-- ============ FOOTER ============ -->
-<footer class="relative z-40 bg-slate text-beam">
-  <div class="max-w-7xl mx-auto px-6 md:px-10 py-16 grid md:grid-cols-[1fr_auto] gap-10 items-start">
-    <div>
-      <a href="#top" class="flex items-center gap-2.5">
-        <span class="w-8 h-8 rounded-full bg-beam text-slate flex items-center justify-center font-serif text-base italic">भ</span>
-        <span class="font-serif text-lg">BhashaShiksha</span>
+  <!-- ============ NAVBAR ============ -->
+  <header id="site-header" class="fixed top-0 inset-x-0 z-[60] transition-colors duration-300">
+    <nav class="max-w-7xl mx-auto flex items-center justify-between px-6 md:px-10 py-5">
+      <a href="#top" class="flex items-center gap-2.5 group">
+        <span
+          class="w-9 h-9 rounded-full bg-slate text-beam flex items-center justify-center font-serif text-lg italic">भ</span>
+        <span class="font-serif text-xl tracking-tight">Edu-Essence</span>
       </a>
-      <p class="text-beam/60 text-sm mt-4 max-w-sm leading-relaxed">Mother-tongue first learning for every primary classroom in India, online or off.</p>
-    </div>
-    <div class="flex gap-10 text-sm">
-      <a href="#tutor" class="text-beam/70 hover:text-beam transition-colors">About</a>
-      <a href="#translator" class="text-beam/70 hover:text-beam transition-colors">Dashboard</a>
-      <a href="#top" class="text-beam/70 hover:text-beam transition-colors">Get Started</a>
-    </div>
-  </div>
-  <div class="border-t border-beam/10 py-6 text-center text-xs text-beam/40">© 2026 BhashaShiksha. Built for classrooms, not boardrooms.</div>
-</footer>
 
-<script src="script.js"></script>
+
+      <div class="hidden md:flex items-center gap-8 text-[15px] font-medium">
+        <a href="#top" class="font-bold hover:opacity-60 transition-opacity focus-ring rounded">Home</a>
+        <a href="#tutor" class="hover:opacity-60 transition-opacity focus-ring rounded">About</a>
+        <a href="#translator" class="hover:opacity-60 transition-opacity focus-ring rounded">Progress</a>
+
+        <a href="#top"
+          class="inline-flex items-center gap-2 bg-slate text-beam text-sm font-semibold px-5 py-2.5 rounded-full hover:bg-plum transition-colors focus-ring shadow-md hover:shadow-lg">
+          Log In
+        </a>
+      </div>
+
+      <button id="menu-btn"
+        class="md:hidden w-10 h-10 flex items-center justify-center rounded-full border border-slate/20 focus-ring"
+        aria-label="Open menu" aria-expanded="false">
+        <svg id="menu-icon-open" width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <path d="M1 4h16M1 9h16M1 14h16" stroke="#1F2421" stroke-width="1.6" stroke-linecap="round" />
+        </svg>
+        <svg id="menu-icon-close" width="16" height="16" viewBox="0 0 16 16" fill="none" class="hidden">
+          <path d="M1 1l14 14M15 1L1 15" stroke="#1F2421" stroke-width="1.6" stroke-linecap="round" />
+        </svg>
+      </button>
+    </nav>
+
+    <!-- mobile menu -->
+    <div id="mobile-menu"
+      class="md:hidden hidden bg-beam border-t border-slate/10 px-6 py-6 flex flex-col gap-5 text-base font-medium">
+      <a href="#top" class="mobile-link font-bold">Home</a>
+      <a href="#tutor" class="mobile-link">About</a>
+      <a href="#translator" class="mobile-link">Progress</a>
+      <a href="#top"
+        class="inline-flex justify-center bg-slate text-beam text-sm font-semibold px-5 py-3 rounded-full shadow-md">Log
+        In</a>
+    </div>
+  </header>
+
+  <!-- ============ SECTION 1 · HERO ============ -->
+  <!-- Increased overall padding and height for a larger hero space -->
+  <section id="top" class="relative z-0 min-h-[90vh] pt-40 pb-36 md:pt-52 md:pb-48 flex items-center overflow-hidden">
+    <div class="max-w-7xl mx-auto px-6 md:px-10 grid md:grid-cols-[1.15fr_0.85fr] gap-16 md:gap-20 items-center w-full">
+
+      <div class="reveal" data-reveal>
+        <span
+          class="inline-flex items-center gap-2 bg-lilac/50 border border-slate/10 text-[13px] font-semibold tracking-wide px-4 py-1.5 rounded-full shadow-sm">
+          Mother-tongue primary education
+        </span>
+
+        <!-- Colored 'mother tongue' in dark lilac using .text-lilac-dark -->
+        <h1 class="font-serif text-[2.8rem] leading-[1.08] sm:text-6xl sm:leading-[1.05] mt-7 max-w-2xl">
+          Every child understands best in their <span class="text-lilac-dark font-semibold">mother tongue.</span>
+        </h1>
+
+        <p class="mt-6 text-[18px] leading-relaxed text-slate/75 max-w-[48ch]">
+          An AI-powered vernacular pedagogy and real-time translation tool designed to make primary foundational
+          learning accessible, inclusive, and natural.
+        </p>
+
+        <div class="mt-12 flex flex-wrap items-center gap-4">
+          <a href="#tutor"
+            class="inline-flex items-center gap-2 bg-slate text-beam font-semibold px-7 py-4 rounded-full hover:bg-plum transition-colors focus-ring shadow-lg hover:shadow-xl">
+            Live Classes
+            <svg width="15" height="12" viewBox="0 0 15 12" fill="none">
+              <path d="M1 6h12.5M8.5 1l5 5-5 5" stroke="#FFF8D3" stroke-width="1.6" stroke-linecap="round"
+                stroke-linejoin="round" />
+            </svg>
+          </a>
+          <a href="#translator"
+            class="inline-flex items-center gap-2 border border-slate/30 font-semibold px-7 py-4 rounded-full hover:bg-slate hover:text-beam hover:border-slate transition-colors focus-ring shadow-md hover:shadow-lg">
+            Self-Study
+          </a>
+        </div>
+
+        <div class="mt-16 flex items-center gap-8 text-sm text-slate/60">
+          <div><span class="block font-serif text-3xl text-slate">12+</span>Indian languages</div>
+          <div class="w-px h-10 bg-slate/15"></div>
+          <div><span class="block font-serif text-3xl text-slate">Offline</span>ready for rural classrooms</div>
+        </div>
+      </div>
+
+      <!-- Expanded right side visual container height -->
+      <div class="relative h-[500px] hidden md:block reveal" data-reveal style="transition-delay:.15s">
+        <div class="absolute inset-0 rounded-[2.5rem] bg-lilac/40 -rotate-3 shadow-2xl"></div>
+
+        <div class="absolute top-10 left-2 w-44 bg-beam rounded-2xl shadow-xl px-5 py-4 float-slow" style="--r:-6deg">
+          <p class="text-[11px] font-semibold text-slate/50">Hindi · नमस्ते</p>
+          <p class="font-serif text-2xl mt-1">Welcome</p>
+        </div>
+
+        <div class="absolute top-28 right-2 w-44 bg-slate text-beam rounded-2xl shadow-xl px-5 py-4 float-slow-rev"
+          style="--r:5deg">
+          <p class="text-[11px] font-semibold text-beam/60">Tamil · வணக்கம்</p>
+          <p class="font-serif text-2xl mt-1">Hello</p>
+        </div>
+
+        <div class="absolute bottom-24 left-8 w-44 bg-beam rounded-2xl shadow-xl px-5 py-4 float-slower"
+          style="--r:-4deg">
+          <p class="text-[11px] font-semibold text-slate/50">Bengali · শেখা</p>
+          <p class="font-serif text-2xl mt-1">Learning</p>
+        </div>
+
+        <div class="absolute bottom-8 right-6 w-44 bg-lilac rounded-2xl shadow-xl px-5 py-4 float-slow"
+          style="--r:6deg; animation-delay:1.2s">
+          <p class="text-[11px] font-semibold text-slate/50">Telugu · పాఠశాల</p>
+          <p class="font-serif text-2xl mt-1">School</p>
+        </div>
+
+        <div
+          class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-28 h-28 rounded-full bg-cream border-4 border-beam shadow-2xl flex items-center justify-center">
+          <span class="font-serif italic text-4xl">अ</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SECTION 2 · 3D HUMAN TEACHER (sticky pin) ============ -->
+  <div class="stack-wrap h-[170vh] md:h-[190vh]">
+    <section id="tutor"
+      class="stack-pin z-20 bg-beam rounded-t-[2.5rem] md:rounded-t-[3.5rem] shadow-[0_-30px_60px_-15px_rgba(31,36,33,0.25)] overflow-y-auto">
+      <div class="max-w-7xl mx-auto px-6 md:px-10 py-16 md:py-24 grid lg:grid-cols-[0.9fr_1.1fr] gap-16 items-center">
+
+        <!-- avatar visual -->
+        <div class="relative mx-auto w-full max-w-sm">
+          <div class="absolute -inset-6 rounded-[2.5rem] bg-lilac/50"></div>
+          <div
+            class="relative bg-cream rounded-[2rem] p-8 aspect-[4/5] flex flex-col items-center justify-end overflow-hidden">
+            <!-- simple friendly avatar, hand-drawn not photoreal -->
+            <svg viewBox="0 0 200 220" class="w-44 h-44 mb-2" aria-hidden="true">
+              <circle cx="100" cy="80" r="52" fill="#1F2421" />
+              <circle cx="82" cy="78" r="5" fill="#FFF8D3" />
+              <circle cx="118" cy="78" r="5" fill="#FFF8D3" />
+              <path d="M78 100q22 16 44 0" stroke="#FFF8D3" stroke-width="4" fill="none" stroke-linecap="round" />
+              <path d="M40 220v-30c0-33 27-50 60-50s60 17 60 50v30" fill="#C7B4D8" />
+            </svg>
+            <div class="w-full bg-slate text-beam rounded-2xl px-4 py-3 text-sm relative">
+              <span class="font-medium">“चलो साथ में सीखते हैं!”</span>
+              <span class="block text-beam/60 text-xs mt-0.5">Let's learn together — spoken in the student's
+                dialect</span>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <span
+            class="inline-flex items-center gap-2 bg-lilac/50 border border-slate/10 text-[13px] font-semibold px-4 py-1.5 rounded-full">
+            AI pedagogy &amp; interactive avatar
+          </span>
+          <h2 class="font-serif text-4xl sm:text-[2.75rem] leading-[1.1] mt-6 max-w-lg">
+            Meet your vernacular 3D AI tutor
+          </h2>
+          <p class="mt-4 text-slate/70 max-w-lg leading-relaxed">
+            A classroom companion that reads, speaks, and reasons in the child's own language — turning static textbooks
+            into a patient, gesturing teacher.
+          </p>
+
+          <div class="mt-10 grid sm:grid-cols-2 gap-5">
+            <div class="bg-cream rounded-2xl p-6 border border-slate/10">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+                <path d="M12 3v12M12 3l-4 4M12 3l4 4M5 15v3a2 2 0 002 2h10a2 2 0 002-2v-3" stroke="#1F2421"
+                  stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+              <h3 class="font-serif text-lg mt-4">Upload study material</h3>
+              <p class="text-sm text-slate/65 mt-2 leading-relaxed">Drop in textbook pages, syllabus notes, or
+                storybooks — get an instant translated, conversational lesson.</p>
+            </div>
+
+            <div class="bg-cream rounded-2xl p-6 border border-slate/10">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+                <path d="M9 12l2 2 4-4M12 3l8 4v5c0 5-3.5 8.5-8 9-4.5-.5-8-4-8-9V7l8-4z" stroke="#1F2421"
+                  stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+              <h3 class="font-serif text-lg mt-4">Automated test generator</h3>
+              <p class="text-sm text-slate/65 mt-2 leading-relaxed">Dynamic quizzes, voice-assisted assessments, and
+                multiple-choice questions in the student's regional dialect.</p>
+            </div>
+
+            <div class="bg-cream rounded-2xl p-6 border border-slate/10 sm:col-span-2">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+                <rect x="9" y="2" width="6" height="12" rx="3" stroke="#1F2421" stroke-width="1.6" />
+                <path d="M5 11a7 7 0 0014 0M12 18v3m-4 0h8" stroke="#1F2421" stroke-width="1.6"
+                  stroke-linecap="round" />
+              </svg>
+              <h3 class="font-serif text-lg mt-4">Voice &amp; text Q&amp;A</h3>
+              <p class="text-sm text-slate/65 mt-2 leading-relaxed">A real-time animated tutor that speaks, gestures,
+                and explains doubts step-by-step with phonetic accuracy — ask by typing or by speaking.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ============ SECTION 3 · REAL-TIME TRANSLATOR (sticky pin, stacks over section 2) ============ -->
+  <div class="stack-wrap h-[190vh] md:h-[210vh]">
+    <section id="translator"
+      class="stack-pin z-30 bg-lilac/70 rounded-t-[2.5rem] md:rounded-t-[3.5rem] shadow-[0_-30px_60px_-15px_rgba(31,36,33,0.3)] overflow-y-auto grain">
+      <div class="max-w-7xl mx-auto px-6 md:px-10 py-16 md:py-24">
+
+        <div class="max-w-2xl">
+          <span
+            class="inline-flex items-center gap-2 bg-cream/80 border border-slate/10 text-[13px] font-semibold px-4 py-1.5 rounded-full">
+            Live classroom bridge
+          </span>
+          <h2 class="font-serif text-4xl sm:text-[2.75rem] leading-[1.1] mt-6">
+            Break language barriers in and out of the classroom
+          </h2>
+          <p class="mt-4 text-slate/70 leading-relaxed">
+            A translator built for the realities of Indian classrooms — from patchy village networks to fast-moving city
+            lectures.
+          </p>
+        </div>
+
+        <!-- mode toggle mock -->
+        <div class="mt-12 grid md:grid-cols-2 gap-6">
+          <div class="bg-cream rounded-2xl p-7 border border-slate/10">
+            <div class="flex items-start justify-between">
+              <div>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                  <path d="M3 3l18 18M8.5 8.5A11 11 0 0121 9M5 9a11 11 0 013 -1.9M12 17a2 2 0 100 4 2 2 0 000-4z"
+                    stroke="#1F2421" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+                <h3 class="font-serif text-xl mt-3">Offline mode</h3>
+              </div>
+              <span class="text-[11px] font-semibold bg-beam px-2.5 py-1 rounded-full">On-device</span>
+            </div>
+            <p class="text-sm text-slate/65 mt-3 leading-relaxed">Lightweight multilingual models run directly on
+              low-cost devices, so rural classrooms with zero or weak connectivity can still translate and learn
+              seamlessly.</p>
+          </div>
+
+          <div class="bg-cream rounded-2xl p-7 border border-slate/10">
+            <div class="flex items-start justify-between">
+              <div>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                  <path d="M7 18a4.5 4.5 0 01-.4-8.98A5.5 5.5 0 0117 8a4 4 0 010 8H7z" stroke="#1F2421"
+                    stroke-width="1.6" stroke-linejoin="round" />
+                </svg>
+                <h3 class="font-serif text-xl mt-3">Online mode</h3>
+              </div>
+              <span class="text-[11px] font-semibold bg-beam px-2.5 py-1 rounded-full">Cloud-powered</span>
+            </div>
+            <p class="text-sm text-slate/65 mt-3 leading-relaxed">Live audio streaming translates lectures as they
+              happen, with synchronized multilingual transcriptions for every student in the room.</p>
+          </div>
+        </div>
+
+        <!-- interactive mock: dialect switcher + toggle -->
+        <div
+          class="mt-8 bg-slate text-beam rounded-2xl p-7 flex flex-col md:flex-row md:items-center gap-6 justify-between">
+          <div>
+            <p class="text-sm text-beam/60">Try switching the classroom dialect</p>
+            <div id="dialect-chips" class="flex flex-wrap gap-2 mt-3">
+              <button data-chip
+                class="chip text-sm font-medium px-4 py-1.5 rounded-full bg-beam text-slate">Hindi</button>
+              <button data-chip
+                class="chip text-sm font-medium px-4 py-1.5 rounded-full border border-beam/30 hover:bg-beam/10">Tamil</button>
+              <button data-chip
+                class="chip text-sm font-medium px-4 py-1.5 rounded-full border border-beam/30 hover:bg-beam/10">Bengali</button>
+              <button data-chip
+                class="chip text-sm font-medium px-4 py-1.5 rounded-full border border-beam/30 hover:bg-beam/10">Telugu</button>
+              <button data-chip
+                class="chip text-sm font-medium px-4 py-1.5 rounded-full border border-beam/30 hover:bg-beam/10">Marathi</button>
+            </div>
+          </div>
+
+          <button id="mode-toggle" class="flex items-center gap-3 self-start md:self-auto" aria-pressed="false">
+            <span class="text-sm font-medium">Offline</span>
+            <span id="switch-track" class="switch-track w-12 h-7 rounded-full bg-beam/20 relative">
+              <span id="switch-dot" class="switch-dot absolute top-1 left-1 w-5 h-5 rounded-full bg-beam"></span>
+            </span>
+            <span class="text-sm font-medium text-beam/50">Online</span>
+          </button>
+        </div>
+
+        <!-- extra features -->
+        <div class="mt-8 grid sm:grid-cols-3 gap-5">
+          <div class="bg-cream/70 rounded-2xl p-6 border border-slate/10">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path d="M11 5L6 9H2v6h4l5 4V5z" stroke="#1F2421" stroke-width="1.6" stroke-linejoin="round" />
+              <path d="M16 8.5a5 5 0 010 7" stroke="#1F2421" stroke-width="1.6" stroke-linecap="round" />
+            </svg>
+            <h3 class="font-serif text-lg mt-3">Pronunciation correction</h3>
+            <p class="text-sm text-slate/65 mt-2 leading-relaxed">Instant voice feedback helps students refine
+              vernacular pronunciation as they speak.</p>
+          </div>
+          <div class="bg-cream/70 rounded-2xl p-6 border border-slate/10">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <rect x="3" y="4" width="18" height="14" rx="2" stroke="#1F2421" stroke-width="1.6" />
+              <path d="M3 15l5-5 4 4 4-3 5 4" stroke="#1F2421" stroke-width="1.6" stroke-linecap="round"
+                stroke-linejoin="round" />
+            </svg>
+            <h3 class="font-serif text-lg mt-3">Picture-to-vernacular cards</h3>
+            <p class="text-sm text-slate/65 mt-2 leading-relaxed">Visual vocabulary cards pair everyday images with
+              their word in the child's language.</p>
+          </div>
+          <div class="bg-cream/70 rounded-2xl p-6 border border-slate/10">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="9" stroke="#1F2421" stroke-width="1.6" />
+              <path d="M3 12h18M12 3a13 13 0 010 18M12 3a13 13 0 000 18" stroke="#1F2421" stroke-width="1.6" />
+            </svg>
+            <h3 class="font-serif text-lg mt-3">Multi-dialect switching</h3>
+            <p class="text-sm text-slate/65 mt-2 leading-relaxed">Move between Hindi, Tamil, Bengali, Telugu, Marathi,
+              and more, mid-lesson.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="relative z-40 bg-slate text-beam">
+    <div class="max-w-7xl mx-auto px-6 md:px-10 py-16 grid md:grid-cols-[1fr_auto] gap-10 items-start">
+      <div>
+        <a href="#top" class="flex items-center gap-2.5">
+          <span
+            class="w-8 h-8 rounded-full bg-beam text-slate flex items-center justify-center font-serif text-base italic">भ</span>
+          <span class="font-serif text-lg">BhashaShiksha</span>
+        </a>
+        <p class="text-beam/60 text-sm mt-4 max-w-sm leading-relaxed">Mother-tongue first learning for every primary
+          classroom in India, online or off.</p>
+      </div>
+      <div class="flex gap-10 text-sm">
+        <a href="#tutor" class="text-beam/70 hover:text-beam transition-colors">About</a>
+        <a href="#translator" class="text-beam/70 hover:text-beam transition-colors">Dashboard</a>
+        <a href="#top" class="text-beam/70 hover:text-beam transition-colors">Get Started</a>
+      </div>
+    </div>
+    <div class="border-t border-beam/10 py-6 text-center text-xs text-beam/40">© 2026 BhashaShiksha. Built for
+      classrooms, not boardrooms.</div>
+  </footer>
+
+  <script src="script.js"></script>
 </body>
+
 </html>
