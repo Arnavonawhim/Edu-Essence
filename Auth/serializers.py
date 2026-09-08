@@ -58,6 +58,10 @@ class RegisterSerializer(serializers.ModelSerializer):
             )
         ],
     )
+    role = serializers.ChoiceField(
+        choices=User.Role.choices,
+        default=User.Role.STUDENT,
+    )
     password = serializers.CharField(write_only=True, style={'input_type': 'password'})
     confirm_password = serializers.CharField(write_only=True, style={'input_type': 'password'})
 
@@ -68,6 +72,7 @@ class RegisterSerializer(serializers.ModelSerializer):
             'first_name',
             'last_name',
             'email',
+            'role',
             'password',
             'confirm_password',
         ]
