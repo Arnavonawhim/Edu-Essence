@@ -1,0 +1,279 @@
+{
+  "info": {
+    "name": "EduEssence API",
+    "description": "Auth and live translation endpoints. Login stores the JWT automatically; creating a session stores its id.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [{ "key": "token", "value": "{{access_token}}", "type": "string" }]
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://127.0.0.1:8000" },
+    { "key": "access_token", "value": "" },
+    { "key": "refresh_token", "value": "" },
+    { "key": "session_id", "value": "" },
+    { "key": "email", "value": "teacher@example.com" },
+    { "key": "password", "value": "Str0ngPass!23" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const data = pm.response.json();",
+                  "  pm.collectionVariables.set('access_token', data.tokens.access);",
+                  "  pm.collectionVariables.set('refresh_token', data.tokens.refresh);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/api/auth/register/", "host": ["{{base_url}}"], "path": ["api", "auth", "register", ""] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"teacher1\",\n  \"first_name\": \"Asha\",\n  \"last_name\": \"Verma\",\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\",\n  \"confirm_password\": \"{{password}}\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const data = pm.response.json();",
+                  "  pm.collectionVariables.set('access_token', data.tokens.access);",
+                  "  pm.collectionVariables.set('refresh_token', data.tokens.refresh);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/api/auth/login/", "host": ["{{base_url}}"], "path": ["api", "auth", "login", ""] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Me",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/auth/me/", "host": ["{{base_url}}"], "path": ["api", "auth", "me", ""] }
+          }
+        },
+        {
+          "name": "Refresh token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const data = pm.response.json();",
+                  "  pm.collectionVariables.set('access_token', data.access);",
+                  "  if (data.refresh) { pm.collectionVariables.set('refresh_token', data.refresh); }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/api/auth/token/refresh/", "host": ["{{base_url}}"], "path": ["api", "auth", "token", "refresh", ""] },
+            "body": { "mode": "raw", "raw": "{\n  \"refresh\": \"{{refresh_token}}\"\n}" }
+          }
+        },
+        {
+          "name": "Change password",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/api/auth/change-password/", "host": ["{{base_url}}"], "path": ["api", "auth", "change-password", ""] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"old_password\": \"{{password}}\",\n  \"password\": \"An0therPass!45\",\n  \"confirm_password\": \"An0therPass!45\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/api/auth/logout/", "host": ["{{base_url}}"], "path": ["api", "auth", "logout", ""] },
+            "body": { "mode": "raw", "raw": "{\n  \"refresh\": \"{{refresh_token}}\"\n}" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Live Translation",
+      "item": [
+        {
+          "name": "Languages",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/translation/languages/", "host": ["{{base_url}}"], "path": ["api", "translation", "languages", ""] }
+          }
+        },
+        {
+          "name": "Speak text (no API key needed)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const data = pm.response.json();",
+                  "  console.log('Paste this into a browser tab to hear it:');",
+                  "  console.log('data:' + data.audio_format + ';base64,' + data.audio_base64);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/api/translation/speech/", "host": ["{{base_url}}"], "path": ["api", "translation", "speech", ""] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"आज हम प्रकाश संश्लेषण के बारे में सीखेंगे\",\n  \"language\": \"hi\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Translate text",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/api/translation/translate/", "host": ["{{base_url}}"], "path": ["api", "translation", "translate", ""] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"Today we are going to learn about photosynthesis.\",\n  \"source_language\": \"en\",\n  \"target_language\": \"hi\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Start session",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  pm.collectionVariables.set('session_id', pm.response.json().id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/api/translation/sessions/", "host": ["{{base_url}}"], "path": ["api", "translation", "sessions", ""] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Class 5 Science\",\n  \"subject\": \"Science\",\n  \"topic\": \"Photosynthesis\",\n  \"source_language\": \"en\",\n  \"target_language\": \"hi\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Send utterance (audio file)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const data = pm.response.json();",
+                  "  console.log('Heard:      ' + data.chunk.original_text);",
+                  "  console.log('Translated: ' + data.chunk.translated_text);",
+                  "  console.log('Latency:    ' + data.chunk.latency_ms + 'ms');",
+                  "  if (data.audio_base64) {",
+                  "    console.log('data:' + data.audio_format + ';base64,' + data.audio_base64);",
+                  "  }",
+                  "} else if (pm.response.code === 204) {",
+                  "  console.log('No speech detected in that clip.');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/api/translation/sessions/{{session_id}}/utterances/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "translation", "sessions", "{{session_id}}", "utterances", ""]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "audio", "type": "file", "src": [], "description": "Pick a recorded clip: wav, mp3, m4a, webm or ogg" },
+                { "key": "speak", "value": "true", "type": "text" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Session with transcript",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/translation/sessions/{{session_id}}/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "translation", "sessions", "{{session_id}}", ""]
+            }
+          }
+        },
+        {
+          "name": "List sessions",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/api/translation/sessions/", "host": ["{{base_url}}"], "path": ["api", "translation", "sessions", ""] }
+          }
+        },
+        {
+          "name": "End session",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/api/translation/sessions/{{session_id}}/end/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "translation", "sessions", "{{session_id}}", "end", ""]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

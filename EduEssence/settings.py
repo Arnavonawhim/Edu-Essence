@@ -15,9 +15,12 @@ from datetime import timedelta
 from pathlib import Path
 
 import dj_database_url
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+load_dotenv(BASE_DIR / '.env')
 
 
 # Quick-start development settings - unsuitable for production
@@ -64,6 +67,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt.token_blacklist',
     'drf_spectacular',
     'Auth',
+    'Translation',
 ]
 
 AUTH_USER_MODEL = 'user_auth.User'
@@ -95,6 +99,26 @@ SIMPLE_JWT = {
     'SIGNING_KEY': SECRET_KEY,
 }
 
+GROQ_API_KEY = os.environ.get('GROQ_API_KEY', '')
+GROQ_STT_MODEL = os.environ.get('GROQ_STT_MODEL', 'whisper-large-v3-turbo')
+GROQ_TRANSLATION_MODEL = os.environ.get('GROQ_TRANSLATION_MODEL', 'llama-3.3-70b-versatile')
+
+SARVAM_API_KEY = os.environ.get('SARVAM_API_KEY', '')
+SARVAM_STT_MODEL = os.environ.get('SARVAM_STT_MODEL', 'saarika:v2')
+SARVAM_TRANSLATION_MODEL = os.environ.get('SARVAM_TRANSLATION_MODEL', 'mayura:v1')
+SARVAM_TTS_MODEL = os.environ.get('SARVAM_TTS_MODEL', 'bulbul:v2')
+SARVAM_TTS_SPEAKER = os.environ.get('SARVAM_TTS_SPEAKER', 'anushka')
+
+STT_PROVIDER = os.environ.get('STT_PROVIDER', 'groq')
+TRANSLATION_PROVIDER = os.environ.get('TRANSLATION_PROVIDER', 'groq')
+TTS_PROVIDER = os.environ.get('TTS_PROVIDER', 'google')
+
+PROVIDER_TIMEOUT = int(os.environ.get('PROVIDER_TIMEOUT', '20'))
+MAX_UTTERANCE_BYTES = int(os.environ.get('MAX_UTTERANCE_BYTES', str(6 * 1024 * 1024)))
+
+DATA_UPLOAD_MAX_MEMORY_SIZE = MAX_UTTERANCE_BYTES + (1024 * 1024)
+FILE_UPLOAD_MAX_MEMORY_SIZE = DATA_UPLOAD_MAX_MEMORY_SIZE
+
 SPECTACULAR_SETTINGS = {
     'TITLE': 'EduEssence API',
     'DESCRIPTION': 'REST API for the EduEssence platform.',
@@ -103,6 +127,9 @@ SPECTACULAR_SETTINGS = {
     'COMPONENT_SPLIT_REQUEST': True,
     'SCHEMA_PATH_PREFIX': '/api/',
     'SORT_OPERATIONS': False,
+    'ENUM_NAME_OVERRIDES': {
+        'LanguageEnum': 'Translation.languages.LANGUAGE_CHOICES',
+    },
 }
 
 MIDDLEWARE = [

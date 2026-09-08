@@ -8,3 +8,7 @@ media/
 staticfiles/
 .idea/
 .vscode/
+
+# local test artefacts
+EduEssence-openapi.yaml
+sample_teacher_english.mp3
