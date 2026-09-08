@@ -96,6 +96,10 @@ function scheduleSnap() {
     if (insidePinnedTrack(target)) return;
     smoothScrollTo(target, 0.85);
   }, 130);
+}*/
+function scheduleSnap() {
+  clearTimeout(snapTimer);
+  return;
 }
 
 if (!reduceMotion) {
