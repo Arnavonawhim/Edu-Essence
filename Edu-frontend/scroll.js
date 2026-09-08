@@ -100,7 +100,7 @@ function smoothScrollTo(position, duration) {
   }
 }
 
-function scheduleSnap() {
+/*function scheduleSnap() {
   clearTimeout(snapTimer);
   if (!canSnap() || snapping) return;
   snapTimer = setTimeout(() => {
@@ -112,7 +112,7 @@ function scheduleSnap() {
     );
     /* Snapping backwards against the scroll direction would trap the reader on a
        state they are trying to leave, so resolve forwards instead. */
-    const ahead = direction > 0
+   /* const ahead = direction > 0
       ? targets.find(t => t > scroll + 2)
       : [...targets].reverse().find(t => t < scroll - 2);
     const target = (direction !== 0 && (nearest - scroll) * direction < 0 && ahead !== undefined)
@@ -122,6 +122,10 @@ function scheduleSnap() {
     if (Math.abs(target - scroll) < 2) return;
     smoothScrollTo(target, 0.85);
   }, 130);
+}*/
+function scheduleSnap() {
+  clearTimeout(snapTimer);
+  return;
 }
 
 function sectionOffset(section) {

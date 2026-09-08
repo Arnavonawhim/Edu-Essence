@@ -133,7 +133,7 @@ if (authNavBtn) {
   // Check state on page load
   updateAuthButton();
 }*/
-document.addEventListener('DOMContentLoaded', () => {
+/*document.addEventListener('DOMContentLoaded', () => {
   const authNavBtn = document.getElementById('authNavBtn');
 
   if (!authNavBtn) {
@@ -226,4 +226,58 @@ function selectMode(mode) {
 
   // Action based on selected mode
   alert(`Selected: ${mode} Mode`);
+}
+*/
+// Real-Time Translator Click Popup Logic
+document.addEventListener('DOMContentLoaded', () => {
+  const translatorBtn = document.getElementById('translatorBtn');
+  const translatorPopup = document.getElementById('translatorPopup');
+  const translatorChevron = document.getElementById('translatorChevron');
+  const translatorWrapper = document.getElementById('translatorWrapper');
+
+  if (translatorBtn && translatorPopup) {
+    translatorBtn.addEventListener('click', (e) => {
+      e.preventDefault(); // Prevents <a> tag jumps and smooth-scrolling triggers
+      e.stopPropagation();
+
+      const isHidden = translatorPopup.classList.contains('hidden');
+      if (isHidden) {
+        translatorPopup.classList.remove('hidden');
+        if (translatorChevron) translatorChevron.style.transform = 'rotate(180deg)';
+      } else {
+        translatorPopup.classList.add('hidden');
+        if (translatorChevron) translatorChevron.style.transform = 'rotate(0deg)';
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      if (translatorWrapper && !translatorWrapper.contains(e.target)) {
+        translatorPopup.classList.add('hidden');
+        if (translatorChevron) translatorChevron.style.transform = 'rotate(0deg)';
+      }
+    });
+  }
+});
+
+// Mode Selection Handler
+function selectMode(mode) {
+  const popup = document.getElementById('translatorPopup');
+  const chevron = document.getElementById('translatorChevron');
+
+  if (popup) popup.classList.add('hidden');
+  if (chevron) chevron.style.transform = 'rotate(0deg)';
+
+  if (mode === 'offline') {
+    // Redirect directly to your running React App server
+    window.location.href = 'http://localhost:5173/';
+  } else if (mode === 'online') {
+    console.log('Online Mode selected');
+  }
+}
+function goToOfflineMode() {
+  const token = localStorage.getItem('access_token');
+  const targetUrl = token 
+    ? `http://localhost:5175/?token=${encodeURIComponent(token)}` 
+    : 'http://localhost:5175/';
+  window.location.href = targetUrl;
 }
