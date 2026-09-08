@@ -35,9 +35,11 @@ function existingSite() {
   };
 }
 
-export default defineConfig({
-  base: '/app/',
+export default defineConfig(({ command }) => ({
+  /* dev serves this under /app/ next to the static site; the production build is
+     its own Vercel project, deployed at that domain's root. */
+  base: command === 'build' ? '/' : '/app/',
   plugins: [existingSite(), react()],
   /* bind both 127.0.0.1 and ::1, so either spelling of localhost works */
   server: { port: 5175, host: true },
-});
+}));

@@ -6,7 +6,8 @@ import './styles.css';
 
 createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <BrowserRouter basename="/app">
+    {/* dev: mounted under /app alongside the static site. built: its own Vercel project at root. */}
+    <BrowserRouter basename={import.meta.env.DEV ? '/app' : '/'}>
       <App />
     </BrowserRouter>
   </React.StrictMode>
