@@ -206,7 +206,8 @@ loginForm.addEventListener('submit', async (event) => {
       storeSession(data);
       closeAuthModal();
       const accessToken = data.tokens?.access || data.access || data.token || '';
-      window.location.href = `http://localhost:5175/?token=${accessToken}`;
+      /* same origin as this page in both dev (:5175) and the unified deploy */
+      window.location.href = `/?token=${encodeURIComponent(accessToken)}`;
     } else {
       const message =
         firstMessage(data.detail) ||

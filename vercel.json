@@ -1,0 +1,7 @@
+{
+  "buildCommand": "node scripts/build.mjs",
+  "outputDirectory": "dist",
+  "rewrites": [
+    { "source": "/app/:path*", "destination": "/app/index.html" }
+  ]
+}

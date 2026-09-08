@@ -2,6 +2,11 @@ import React, { useState, useEffect, useRef } from 'react';
 
 const API_BASE_URL = 'https://edu-essence.onrender.com';
 
+/* On the unified deploy the static site is this same origin's root. Running the
+   translator's own vite server (:5173) it lives on the react-sample server. */
+const HOME_URL =
+  window.location.port === '5173' ? 'http://localhost:5175/' : '/';
+
 export default function App() {
   // 1. Immediately read and save token BEFORE hooks execute
   const [token, setToken] = useState(() => {
@@ -257,7 +262,7 @@ export default function App() {
       <header className="px-6 md:px-12 py-4 border-b border-[#C7B4D8]/60 flex items-center justify-between bg-[#EBE1C6]">
         <div className="flex items-center gap-6">
           <a
-            href="http://127.0.0.1:5500/Edu-frontend/index.html"
+            href={HOME_URL}
             className="text-sm italic text-[#1F1B24] hover:opacity-75 transition-opacity flex items-center gap-1.5"
           >
             <span>&larr;</span> Back to Home

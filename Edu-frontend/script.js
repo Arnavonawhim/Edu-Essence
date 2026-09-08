@@ -244,24 +244,31 @@ function selectMode(mode) {
   if (chevron) chevron.style.transform = 'rotate(0deg)';
 
   if (mode === 'offline') {
-    // Redirect directly to your running React App server
-    window.location.href = 'http://localhost:5173/';
+    window.location.href = TRANSLATOR_URL;
   } else if (mode === 'online') {
-    window.location.href = 'http://localhost:5175/';
+    window.location.href = CLASSROOM_URL;
   }
 }
+/* In production all three frontends are one Vercel project, so these are plain
+   same-origin paths. Locally the translator runs on its own vite server; the
+   classroom needs no special case because react-sample's vite already serves
+   this static site at root on :5175. */
+const ON_VITE_DEV = window.location.port === '5175';
+const TRANSLATOR_URL = ON_VITE_DEV ? 'http://localhost:5173/translator/' : '/translator/';
+const CLASSROOM_URL = '/app/';
+
 function goToOfflineMode() {
   const token = localStorage.getItem('access_token');
   const targetUrl = token 
-    ? `http://localhost:5173/?token=${encodeURIComponent(token)}` 
-    : 'http://localhost:5173/';
+    ? `${TRANSLATOR_URL}?token=${encodeURIComponent(token)}` 
+    : TRANSLATOR_URL;
   window.location.href = targetUrl;
 }
 function goToOnlineMode() {
   const token = localStorage.getItem('access_token');
   const targetUrl = token 
-    ? `http://localhost:5175/app/?token=${encodeURIComponent(token)}` 
-    : 'http://localhost:5175/app/';
+    ? `${CLASSROOM_URL}?token=${encodeURIComponent(token)}` 
+    : CLASSROOM_URL;
   window.location.href = targetUrl;
 }
 
