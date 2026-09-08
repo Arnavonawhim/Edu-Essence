@@ -97,6 +97,10 @@ function scheduleSnap() {
     smoothScrollTo(target, 0.85);
   }, 130);
 }
+function scheduleSnap() {
+  clearTimeout(snapTimer);
+  return;
+}
 
 if (!reduceMotion) {
   document.documentElement.classList.add('js-motion');

@@ -99,20 +99,49 @@ function closeAuthModal() {
   }, 250);
 }
 
-function storeSession(data) {
-  const tokens = data.tokens || {};
-  localStorage.setItem('access_token', tokens.access || '');
-  localStorage.setItem('refresh_token', tokens.refresh || '');
+/*function storeSession(data) {
+  // Handles both nested { tokens: { access, refresh } } and flat { access, refresh } responses
+  const accessToken = data.tokens?.access || data.access || data.token || '';
+  const refreshToken = data.tokens?.refresh || data.refresh || '';
+
+  if (accessToken) {
+    localStorage.setItem('access_token', accessToken);
+  }
+  if (refreshToken) {
+    localStorage.setItem('refresh_token', refreshToken);
+  }
   localStorage.setItem('isLoggedIn', 'true');
 
-  if (data.user) {
-    localStorage.setItem('user_role', data.user.role || 'student');
-    localStorage.setItem('user_name', data.user.full_name || data.user.username || '');
+  const userData = data.user || data;
+  if (userData.role || userData.full_name || userData.username) {
+    localStorage.setItem('user_role', userData.role || 'student');
+    localStorage.setItem('user_name', userData.full_name || userData.username || '');
   }
 
   window.syncAuthButton?.();
 }
+*/
+function storeSession(data) {
+  // Handles both nested { tokens: { access, refresh } } and flat { access, refresh } responses
+  const accessToken = data.tokens?.access || data.access || data.token || '';
+  const refreshToken = data.tokens?.refresh || data.refresh || '';
 
+  if (accessToken) {
+    localStorage.setItem('access_token', accessToken);
+  }
+  if (refreshToken) {
+    localStorage.setItem('refresh_token', refreshToken);
+  }
+  localStorage.setItem('isLoggedIn', 'true');
+
+  const userData = data.user || data;
+  if (userData.role || userData.full_name || userData.username) {
+    localStorage.setItem('user_role', userData.role || 'student');
+    localStorage.setItem('user_name', userData.full_name || userData.username || '');
+  }
+
+  window.syncAuthButton?.();
+}
 function firstMessage(value) {
   return Array.isArray(value) ? value[0] : value;
 }
@@ -176,6 +205,8 @@ loginForm.addEventListener('submit', async (event) => {
     if (response.ok) {
       storeSession(data);
       closeAuthModal();
+      const accessToken = data.tokens?.access || data.access || data.token || '';
+      window.location.href = `http://localhost:5175/?token=${accessToken}`;
     } else {
       const message =
         firstMessage(data.detail) ||
