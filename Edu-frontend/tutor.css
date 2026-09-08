@@ -1,0 +1,179 @@
+@font-face {
+  font-family: 'Neue Haas Grotesk Display';
+  src: url('assets/fonts/NeueHaasDisplay-Medium.woff2') format('woff2'),
+       url('assets/fonts/NeueHaasDisplay-Medium.woff') format('woff');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Neue Haas Grotesk Display';
+  src: url('assets/fonts/NeueHaasDisplay-Bold.woff2') format('woff2'),
+       url('assets/fonts/NeueHaasDisplay-Bold.woff') format('woff');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Baskerville Italic';
+  src: url('assets/fonts/Baskerville-Italic.woff2') format('woff2'),
+       url('assets/fonts/Baskerville-Italic.woff') format('woff');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+.tutor-stage-frame {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  border-radius: 1.75rem;
+  overflow: hidden;
+  background: linear-gradient(160deg, #C7B4D8 0%, #EBE1C6 70%);
+}
+
+.tutor-stage {
+  width: 100%;
+  height: 100%;
+}
+
+.tutor-stage canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.tutor-stage-status {
+  position: absolute;
+  left: 1.25rem;
+  bottom: 1.25rem;
+  font-family: 'Neue Haas Grotesk Display', 'Helvetica Neue', Arial, sans-serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+  color: #1F2421;
+  background: rgba(255, 248, 211, 0.85);
+  padding: 0.4rem 0.75rem;
+  border-radius: 999px;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.tutor-stage-status[data-hidden="true"] {
+  opacity: 0;
+}
+
+.tutor-select {
+  font-family: 'Neue Haas Grotesk Display', 'Helvetica Neue', Arial, sans-serif;
+  font-size: 0.875rem;
+  border: 1px solid rgba(31, 36, 33, 0.18);
+  border-radius: 999px;
+  padding: 0.4rem 1rem;
+  background: #FFF8D3;
+  color: #1F2421;
+}
+
+.tutor-transcript {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-height: 220px;
+  max-height: 360px;
+  overflow-y: auto;
+  padding: 1.25rem;
+  border-radius: 1.25rem;
+  background: #FFF8D3;
+  border: 1px solid rgba(31, 36, 33, 0.08);
+}
+
+.tutor-bubble {
+  max-width: 85%;
+  padding: 0.65rem 0.95rem;
+  border-radius: 1rem;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.tutor-bubble-role {
+  display: block;
+  font-family: 'Neue Haas Grotesk Display', 'Helvetica Neue', Arial, sans-serif;
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  color: rgba(31, 36, 33, 0.45);
+  margin-bottom: 0.15rem;
+}
+
+.tutor-bubble--student {
+  align-self: flex-end;
+  background: #1F2421;
+  color: #FFF8D3;
+}
+
+.tutor-bubble--student .tutor-bubble-role {
+  color: rgba(255, 248, 211, 0.55);
+}
+
+.tutor-bubble--teacher {
+  align-self: flex-start;
+  background: #EBE1C6;
+  color: #1F2421;
+}
+
+.tutor-input {
+  width: 100%;
+  resize: none;
+  border: 1px solid rgba(31, 36, 33, 0.18);
+  border-radius: 1rem;
+  padding: 0.7rem 1rem;
+  font-family: 'Baskerville Italic', 'Libre Baskerville', Georgia, serif;
+  font-style: italic;
+  font-size: 0.95rem;
+  background: #FFF8D3;
+  color: #1F2421;
+}
+
+.tutor-input:focus {
+  outline: 2px solid #1F2421;
+  outline-offset: 1px;
+}
+
+.tutor-icon-btn {
+  width: 2.75rem;
+  height: 2.75rem;
+  flex-shrink: 0;
+  border-radius: 999px;
+  border: 1px solid rgba(31, 36, 33, 0.18);
+  background: #FFF8D3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tutor-icon-btn[data-recording="true"] {
+  background: #C7B4D8;
+}
+
+.tutor-send-btn {
+  font-family: 'Neue Haas Grotesk Display', 'Helvetica Neue', Arial, sans-serif;
+  font-weight: 500;
+  font-size: 0.875rem;
+  flex-shrink: 0;
+  background: #1F2421;
+  color: #FFF8D3;
+  border-radius: 999px;
+  padding: 0.85rem 1.5rem;
+}
+
+.tutor-send-btn:disabled {
+  opacity: 0.5;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}

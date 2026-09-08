@@ -186,6 +186,9 @@
     <div class="cine-vignette"></div>
 
     <p class="cine-label">N&deg; 02 &mdash; The 3D vernacular teacher</p>
+    <a href="tutor.html" class="cine-cta bg-[#1F1B24] text-white px-6 py-3 rounded-full font-medium text-sm transition hover:opacity-90 inline-flex items-center gap-2 focus-ring">
+      Talk to the teacher now <span>&rarr;</span>
+    </a>
 
     <div class="cine-inner">
 
@@ -502,6 +505,12 @@
     fallback.src = 'https://cdn.jsdelivr.net/npm/lenis@1.3.11/dist/lenis.min.js';
     fallback.onload = () => window.startScrollExperience(window.Lenis);
     document.head.appendChild(fallback);
+  });
+</script>
+
+<script>
+  document.getElementById('teacherBtn')?.addEventListener('click', () => {
+    window.location.href = 'tutor.html';
   });
 </script>
 </body>
