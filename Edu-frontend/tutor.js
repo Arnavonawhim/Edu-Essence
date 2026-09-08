@@ -1,9 +1,18 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { API_BASE_URL, Translation, getAccessToken } from 'api.js';
+import {
+  API_BASE_URL,
+  Auth,
+  Translation,
+  clearTokens,
+  getAccessToken,
+  isSignedIn,
+  setTokens,
+} from 'api.js';
 
 const AVATAR_MODEL_PATH = 'assets/teacher.glb';
 const TUTOR_TURN_ENDPOINT = null;
+const PIVOT_LANGUAGE = 'en';
 
 const FALLBACK_LANGUAGES = [
   { code: 'hi', name: 'Hindi', native_name: 'हिन्दी' },
@@ -16,36 +25,78 @@ const FALLBACK_LANGUAGES = [
   { code: 'en', name: 'English', native_name: 'English' },
 ];
 
+const state = {
+  language: 'hi',
+  sessionId: null,
+  sessionLanguage: null,
+  user: null,
+  backendReachable: false,
+};
+
+function adoptTokenFromUrl() {
+  const params = new URLSearchParams(window.location.search);
+  const token = params.get('token');
+  if (!token) return;
+  setTokens({ access: token });
+  params.delete('token');
+  const rest = params.toString();
+  window.history.replaceState({}, '', window.location.pathname + (rest ? `?${rest}` : ''));
+}
+
 const TutorAvatar = (() => {
-  let renderer, scene, camera, clock;
-  let mouthMesh = null;
-  let mouthIndex = -1;
+  let renderer, scene, camera, clock, root;
+  const mouths = [];
   let placeholderMouth = null;
   let currentAmplitude = 0;
+  let smoothedAmplitude = 0;
 
   const MORPH_TARGET_CANDIDATES = [
-    'jawOpen', 'mouthOpen', 'viseme_aa', 'viseme_AA', 'mouthFunnel', 'MouthOpen',
+    'jawopen', 'mouthopen', 'viseme_aa', 'mouthfunnel', 'jaw_open', 'a_open',
   ];
 
-  function findMorphTarget(root) {
-    let found = null;
-    root.traverse((node) => {
-      if (found) return;
-      if (node.isMesh && node.morphTargetDictionary) {
-        const key = Object.keys(node.morphTargetDictionary).find((name) =>
-          MORPH_TARGET_CANDIDATES.some((candidate) => name.toLowerCase().includes(candidate.toLowerCase()))
-        );
-        if (key) {
-          found = { mesh: node, index: node.morphTargetDictionary[key] };
-        }
+  function collectMorphTargets(node) {
+    node.traverse((child) => {
+      if (!child.isMesh || !child.morphTargetDictionary) return;
+      const key = Object.keys(child.morphTargetDictionary).find((name) =>
+        MORPH_TARGET_CANDIDATES.some((candidate) => name.toLowerCase().includes(candidate))
+      );
+      if (key) {
+        mouths.push({ mesh: child, index: child.morphTargetDictionary[key] });
       }
     });
-    return found;
+    return mouths.length > 0;
+  }
+
+  function frameHead(object) {
+    object.updateWorldMatrix(true, true);
+    const box = new THREE.Box3().setFromObject(object);
+    const size = box.getSize(new THREE.Vector3());
+    const centre = box.getCenter(new THREE.Vector3());
+
+    const height = size.y > 0.5 ? size.y : 1.8;
+    const topY = size.y > 0.5 ? box.max.y : 1.8;
+
+    object.position.x -= centre.x;
+    object.position.z -= centre.z;
+
+    const targetY = topY - height * 0.13;
+    const visibleHeight = height * 0.46;
+    const distance = (visibleHeight / 2) / Math.tan((camera.fov * Math.PI) / 360);
+
+    camera.position.set(0, targetY, distance);
+    camera.lookAt(new THREE.Vector3(0, targetY, 0));
+    camera.updateProjectionMatrix();
+
+    window.__tutorStage = {
+      boxMin: box.min.toArray().map((v) => +v.toFixed(3)),
+      boxMax: box.max.toArray().map((v) => +v.toFixed(3)),
+      targetY: +targetY.toFixed(3),
+      distance: +distance.toFixed(3),
+    };
   }
 
   function buildPlaceholder() {
     const group = new THREE.Group();
-
     const head = new THREE.Mesh(
       new THREE.SphereGeometry(1, 32, 32),
       new THREE.MeshStandardMaterial({ color: 0xfff8d3, roughness: 0.6 })
@@ -68,6 +119,8 @@ const TutorAvatar = (() => {
     group.add(mouth);
 
     placeholderMouth = mouth;
+    camera.position.set(0, 0, 4.2);
+    camera.lookAt(0, 0, 0);
     return group;
   }
 
@@ -75,35 +128,37 @@ const TutorAvatar = (() => {
     clock = new THREE.Clock();
     scene = new THREE.Scene();
 
-    camera = new THREE.PerspectiveCamera(32, container.clientWidth / container.clientHeight, 0.1, 100);
-    camera.position.set(0, 0.15, 4.2);
+    camera = new THREE.PerspectiveCamera(32, container.clientWidth / container.clientHeight, 0.01, 100);
 
     renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setSize(container.clientWidth, container.clientHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
     container.appendChild(renderer.domElement);
 
-    scene.add(new THREE.AmbientLight(0xffffff, 0.9));
-    const key = new THREE.DirectionalLight(0xffffff, 1.1);
-    key.position.set(2, 3, 4);
+    scene.add(new THREE.AmbientLight(0xffffff, 1.7));
+    const key = new THREE.DirectionalLight(0xffffff, 2.2);
+    key.position.set(1.5, 2.5, 3);
     scene.add(key);
+    const rim = new THREE.DirectionalLight(0xc7b4d8, 1.1);
+    rim.position.set(-2, 1.5, -2);
+    scene.add(rim);
 
     const loader = new GLTFLoader();
     loader.load(
       AVATAR_MODEL_PATH,
       (gltf) => {
-        scene.add(gltf.scene);
-        const morph = findMorphTarget(gltf.scene);
-        if (morph) {
-          mouthMesh = morph.mesh;
-          mouthIndex = morph.index;
-        }
-        statusEl.textContent = morph ? 'Teacher ready' : 'Teacher ready (no lip-sync rig found)';
+        root = gltf.scene;
+        scene.add(root);
+        frameHead(root);
+        const rigged = collectMorphTargets(root);
+        statusEl.textContent = rigged ? 'Teacher ready' : 'Teacher ready (no mouth rig in this model yet)';
         fadeStatus(statusEl);
       },
       undefined,
       () => {
-        scene.add(buildPlaceholder());
+        root = buildPlaceholder();
+        scene.add(root);
         statusEl.textContent = 'Teacher ready (placeholder avatar)';
         fadeStatus(statusEl);
       }
@@ -118,6 +173,7 @@ const TutorAvatar = (() => {
   }
 
   function onResize(container) {
+    if (!renderer || !container.clientWidth) return;
     camera.aspect = container.clientWidth / container.clientHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(container.clientWidth, container.clientHeight);
@@ -125,15 +181,21 @@ const TutorAvatar = (() => {
 
   function animate() {
     requestAnimationFrame(animate);
-    const t = clock.getElapsedTime();
+    const elapsed = clock.getElapsedTime();
 
-    if (mouthMesh && mouthIndex >= 0) {
-      mouthMesh.morphTargetInfluences[mouthIndex] = currentAmplitude;
+    smoothedAmplitude += (currentAmplitude - smoothedAmplitude) * 0.35;
+
+    if (mouths.length) {
+      mouths.forEach(({ mesh, index }) => {
+        mesh.morphTargetInfluences[index] = smoothedAmplitude;
+      });
     } else if (placeholderMouth) {
-      placeholderMouth.scale.y = 1 + currentAmplitude * 4;
+      placeholderMouth.scale.y = 1 + smoothedAmplitude * 4;
     }
 
-    scene.rotation.y = Math.sin(t * 0.3) * 0.05;
+    if (root) {
+      root.rotation.y = Math.sin(elapsed * 0.3) * 0.05;
+    }
     renderer.render(scene, camera);
   }
 
@@ -141,63 +203,123 @@ const TutorAvatar = (() => {
     currentAmplitude = Math.min(1, Math.max(0, value));
   }
 
-  return { init, setAmplitude };
+  return { init, setAmplitude, hasMouthRig: () => mouths.length > 0 };
 })();
 
-function base64ToObjectUrl(base64, format) {
-  const byteChars = atob(base64);
-  const byteNumbers = new Array(byteChars.length);
-  for (let i = 0; i < byteChars.length; i += 1) {
-    byteNumbers[i] = byteChars.charCodeAt(i);
-  }
-  const byteArray = new Uint8Array(byteNumbers);
-  const blob = new Blob([byteArray], { type: `audio/${format}` });
-  return URL.createObjectURL(blob);
-}
+const AudioEngine = (() => {
+  let context = null;
+  let analyser = null;
+  const wired = new WeakSet();
 
-function speakAudio(base64, format) {
-  return new Promise((resolve) => {
-    const url = base64ToObjectUrl(base64, format || 'mp3');
-    const audioEl = new Audio(url);
-    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-    const audioContext = new AudioContextClass();
-    const source = audioContext.createMediaElementSource(audioEl);
-    const analyser = audioContext.createAnalyser();
-    analyser.fftSize = 256;
-    source.connect(analyser);
-    analyser.connect(audioContext.destination);
-
-    const data = new Uint8Array(analyser.frequencyBinCount);
-
-    function tick() {
-      analyser.getByteFrequencyData(data);
-      const average = data.reduce((sum, value) => sum + value, 0) / data.length;
-      TutorAvatar.setAmplitude(average / 160);
-      if (!audioEl.paused && !audioEl.ended) {
-        requestAnimationFrame(tick);
-      }
+  function ensureContext() {
+    if (!context) {
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      context = new AudioContextClass();
+      analyser = context.createAnalyser();
+      analyser.fftSize = 256;
+      analyser.smoothingTimeConstant = 0.6;
+      analyser.connect(context.destination);
     }
+    if (context.state === 'suspended') context.resume();
+    return context;
+  }
 
-    audioEl.addEventListener('play', () => requestAnimationFrame(tick));
-    audioEl.addEventListener('ended', () => {
-      TutorAvatar.setAmplitude(0);
-      URL.revokeObjectURL(url);
-      resolve();
+  function play(base64, format) {
+    return new Promise((resolve, reject) => {
+      let url;
+      try {
+        const binary = atob(base64);
+        const bytes = new Uint8Array(binary.length);
+        for (let i = 0; i < binary.length; i += 1) bytes[i] = binary.charCodeAt(i);
+        const mime = format && format.includes('/') ? format : `audio/${format || 'mpeg'}`;
+        url = URL.createObjectURL(new Blob([bytes], { type: mime }));
+      } catch (error) {
+        reject(error);
+        return;
+      }
+
+      ensureContext();
+      const element = new Audio(url);
+
+      if (!wired.has(element)) {
+        const source = context.createMediaElementSource(element);
+        source.connect(analyser);
+        wired.add(element);
+      }
+
+      const data = new Uint8Array(analyser.frequencyBinCount);
+
+      function tick() {
+        analyser.getByteFrequencyData(data);
+        let sum = 0;
+        for (let i = 0; i < data.length; i += 1) sum += data[i];
+        TutorAvatar.setAmplitude(sum / data.length / 90);
+        if (!element.paused && !element.ended) requestAnimationFrame(tick);
+      }
+
+      element.addEventListener('playing', () => requestAnimationFrame(tick));
+      element.addEventListener('ended', () => {
+        TutorAvatar.setAmplitude(0);
+        URL.revokeObjectURL(url);
+        resolve();
+      });
+      element.addEventListener('error', () => {
+        TutorAvatar.setAmplitude(0);
+        URL.revokeObjectURL(url);
+        reject(new Error('Audio playback failed'));
+      });
+
+      element.play().catch(reject);
     });
+  }
 
-    audioEl.play();
-  });
-}
+  return { play, unlock: ensureContext };
+})();
 
 function localPedagogyReply(studentText) {
   const text = studentText.toLowerCase();
-  if (/hello|hi|namaste/.test(text)) {
-    return "Hello! I'm glad you're here. What would you like to understand better today?";
+  if (/hello|hi\b|namaste|vanakkam/.test(text)) {
+    return 'Namaste! I am glad you are here. Which part of the lesson would you like to go over?';
   }
-  if (/add|plus|sum|subtract|multiply|divide|math/.test(text)) {
-    return "Let's break that down one small step at a time, the same way we did it on the board.";
+  if (/add|plus|sum|subtract|minus|multiply|divide|table|math/.test(text)) {
+    return 'Let us do it one small step at a time. Tell me the two numbers, and we will work through them together the way we did on the board.';
   }
-  return "That's a good question. Let's go through it slowly, one idea at a time.";
+  if (/photosynth|plant|leaf|sunlight/.test(text)) {
+    return 'A plant makes its own food using sunlight, water and the air around it. The green colour in the leaf is what catches the sunlight.';
+  }
+  if (/water cycle|rain|cloud|evapor/.test(text)) {
+    return 'Water from rivers and seas warms up and rises as vapour, cools into clouds high above, and falls back down as rain. The same water goes round and round.';
+  }
+  if (/why|how|what/.test(text)) {
+    return 'That is a good question. Let us build the answer slowly, one idea at a time, and you stop me the moment something feels unclear.';
+  }
+  return 'I hear you. Tell me which part is confusing, and we will take it step by step.';
+}
+
+async function ensureSession(language) {
+  if (state.sessionId && state.sessionLanguage === language) return state.sessionId;
+
+  const session = await Translation.createSession({
+    title: '3D vernacular teacher',
+    topic: 'Tutor session',
+    source_language: language,
+    target_language: language === PIVOT_LANGUAGE ? 'hi' : PIVOT_LANGUAGE,
+    mode: 'in_person',
+  });
+
+  state.sessionId = session.id;
+  state.sessionLanguage = language;
+  return session.id;
+}
+
+async function transcribeWithBackend(blob, language) {
+  const sessionId = await ensureSession(language);
+  const result = await Translation.sendUtterance(sessionId, blob, false);
+  const chunk = result.chunk || result;
+  return {
+    spoken: chunk.original_text || '',
+    english: chunk.translated_text || chunk.original_text || '',
+  };
 }
 
 async function getTeacherReply(studentText, languageCode) {
@@ -213,9 +335,9 @@ async function getTeacherReply(studentText, languageCode) {
       });
       if (!response.ok) throw new Error(`Tutor endpoint responded ${response.status}`);
       const data = await response.json();
-      return { text: data.text, audioBase64: data.audio, audioFormat: data.audio_format || 'mp3' };
-    } catch (err) {
-      console.warn('Tutor endpoint unavailable, falling back to translate + speech', err);
+      return { text: data.text, audioBase64: data.audio, audioFormat: data.audio_format || 'audio/mpeg' };
+    } catch (error) {
+      console.warn('Tutor endpoint unavailable, using translate + speech instead', error);
     }
   }
 
@@ -223,16 +345,12 @@ async function getTeacherReply(studentText, languageCode) {
   let replyText = replyEnglish;
 
   if (languageCode !== 'en') {
-    try {
-      const translated = await Translation.translateText({
-        text: replyEnglish,
-        source_language: 'en',
-        target_language: languageCode,
-      });
-      replyText = translated.translated_text;
-    } catch (err) {
-      console.warn('Translation unavailable, speaking English reply instead', err);
-    }
+    const translated = await Translation.translateText({
+      text: replyEnglish,
+      source_language: 'en',
+      target_language: languageCode,
+    });
+    replyText = translated.translated_text || replyEnglish;
   }
 
   const speech = await Translation.synthesizeSpeech({
@@ -240,7 +358,11 @@ async function getTeacherReply(studentText, languageCode) {
     language: languageCode,
   });
 
-  return { text: replyText, audioBase64: speech.audio_base64, audioFormat: speech.audio_format };
+  return {
+    text: replyText,
+    audioBase64: speech.audio_base64,
+    audioFormat: speech.audio_format || 'audio/mpeg',
+  };
 }
 
 function appendBubble(container, role, text) {
@@ -255,6 +377,7 @@ function appendBubble(container, role, text) {
   bubble.append(label, paragraph);
   container.appendChild(bubble);
   container.scrollTop = container.scrollHeight;
+  return bubble;
 }
 
 async function populateLanguages(select) {
@@ -263,43 +386,81 @@ async function populateLanguages(select) {
     const fetched = await Translation.listLanguages();
     if (Array.isArray(fetched) && fetched.length) {
       languages = fetched;
+      state.backendReachable = true;
     }
-  } catch (err) {
-    console.warn('Falling back to the built-in language list', err);
+  } catch (error) {
+    console.warn('Falling back to the built-in language list', error);
   }
+  select.innerHTML = '';
   languages.forEach((lang) => {
     const option = document.createElement('option');
     option.value = lang.code;
     option.textContent = `${lang.name} · ${lang.native_name}`;
     select.appendChild(option);
   });
+  select.value = languages.some((item) => item.code === state.language) ? state.language : languages[0].code;
+  state.language = select.value;
 }
 
-function setupSpeechInput(micBtn, questionInput, languageSelect, onAutoSubmit) {
-  const SpeechRecognitionClass = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SpeechRecognitionClass) return;
+function setStatusPill(pill, mode, text) {
+  pill.dataset.mode = mode;
+  pill.textContent = text;
+}
 
-  micBtn.hidden = false;
-  const recognition = new SpeechRecognitionClass();
-  recognition.interimResults = false;
-  recognition.maxAlternatives = 1;
+async function refreshIdentity(pill, signOutBtn) {
+  if (!isSignedIn()) {
+    state.user = null;
+    setStatusPill(pill, 'signed-out', 'Not signed in — sign in on the home page to use the backend');
+    signOutBtn.hidden = true;
+    return;
+  }
+  try {
+    const me = await Auth.me();
+    state.user = me;
+    state.backendReachable = true;
+    const name = me.full_name || me.first_name || me.email;
+    setStatusPill(pill, 'signed-in', `Signed in as ${name} (${me.role})`);
+    signOutBtn.hidden = false;
+  } catch (error) {
+    state.user = null;
+    setStatusPill(pill, 'error', 'Signed in, but the API did not accept the token');
+    signOutBtn.hidden = false;
+  }
+}
 
-  micBtn.addEventListener('click', () => {
-    recognition.lang = languageSelect.value || 'en';
-    micBtn.setAttribute('data-recording', 'true');
-    recognition.start();
-  });
+function createRecorder(onBlob) {
+  let recorder = null;
+  let chunks = [];
 
-  recognition.addEventListener('result', (event) => {
-    questionInput.value = event.results[0][0].transcript;
-    onAutoSubmit();
-  });
+  async function start() {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    chunks = [];
+    recorder = new MediaRecorder(stream);
+    recorder.addEventListener('dataavailable', (event) => {
+      if (event.data.size) chunks.push(event.data);
+    });
+    recorder.addEventListener('stop', () => {
+      stream.getTracks().forEach((track) => track.stop());
+      if (chunks.length) onBlob(new Blob(chunks, { type: recorder.mimeType || 'audio/webm' }));
+    });
+    recorder.start();
+  }
 
-  recognition.addEventListener('end', () => micBtn.setAttribute('data-recording', 'false'));
-  recognition.addEventListener('error', () => micBtn.setAttribute('data-recording', 'false'));
+  function stop() {
+    if (recorder && recorder.state !== 'inactive') recorder.stop();
+    recorder = null;
+  }
+
+  function isRecording() {
+    return Boolean(recorder && recorder.state === 'recording');
+  }
+
+  return { start, stop, isRecording };
 }
 
 function init() {
+  adoptTokenFromUrl();
+
   const viewport = document.getElementById('avatarViewport');
   const statusEl = document.getElementById('stageStatus');
   const transcript = document.getElementById('transcript');
@@ -309,27 +470,47 @@ function init() {
   const askNote = document.getElementById('askNote');
   const submitBtn = document.getElementById('askSubmitBtn');
   const micBtn = document.getElementById('micBtn');
+  const authPill = document.getElementById('authPill');
+  const signOutBtn = document.getElementById('signOutBtn');
+  const apiBaseLabel = document.getElementById('apiBaseLabel');
+
+  if (apiBaseLabel) apiBaseLabel.textContent = API_BASE_URL;
 
   TutorAvatar.init(viewport, statusEl);
   populateLanguages(languageSelect);
+  refreshIdentity(authPill, signOutBtn);
 
-  async function handleSubmit() {
-    const studentText = questionInput.value.trim();
-    if (!studentText) return;
+  languageSelect.addEventListener('change', () => {
+    state.language = languageSelect.value;
+  });
 
-    appendBubble(transcript, 'student', studentText);
+  if (signOutBtn) {
+    signOutBtn.addEventListener('click', () => {
+      clearTokens();
+      state.sessionId = null;
+      refreshIdentity(authPill, signOutBtn);
+    });
+  }
+
+  async function ask(studentText, spokenOriginal) {
+    appendBubble(transcript, 'student', spokenOriginal || studentText);
     questionInput.value = '';
     submitBtn.disabled = true;
     askNote.textContent = 'The teacher is thinking…';
 
     try {
-      const reply = await getTeacherReply(studentText, languageSelect.value);
+      const reply = await getTeacherReply(studentText, state.language);
       appendBubble(transcript, 'teacher', reply.text);
       askNote.textContent = '';
-      await speakAudio(reply.audioBase64, reply.audioFormat);
-    } catch (err) {
-      console.error(err);
-      askNote.textContent = "Couldn't reach the teacher right now — check the API is running.";
+      if (reply.audioBase64) {
+        await AudioEngine.play(reply.audioBase64, reply.audioFormat);
+      }
+    } catch (error) {
+      console.error(error);
+      const detail = error.status === 401
+        ? 'You need to sign in on the home page first.'
+        : 'Could not reach the backend — check the Django server is running.';
+      askNote.textContent = detail;
     } finally {
       submitBtn.disabled = false;
     }
@@ -337,10 +518,46 @@ function init() {
 
   form.addEventListener('submit', (event) => {
     event.preventDefault();
-    handleSubmit();
+    AudioEngine.unlock();
+    const text = questionInput.value.trim();
+    if (text) ask(text);
   });
 
-  setupSpeechInput(micBtn, questionInput, languageSelect, handleSubmit);
+  if (micBtn && navigator.mediaDevices && window.MediaRecorder) {
+    micBtn.hidden = false;
+    const recorder = createRecorder(async (blob) => {
+      askNote.textContent = 'Listening to what you said…';
+      try {
+        const heard = await transcribeWithBackend(blob, state.language);
+        if (!heard.english) {
+          askNote.textContent = 'I could not catch that — try again.';
+          return;
+        }
+        await ask(heard.english, heard.spoken);
+      } catch (error) {
+        console.error(error);
+        askNote.textContent = 'Speech recognition needs the backend and a signed-in account.';
+      }
+    });
+
+    micBtn.addEventListener('click', async () => {
+      AudioEngine.unlock();
+      if (recorder.isRecording()) {
+        micBtn.setAttribute('data-recording', 'false');
+        askNote.textContent = '';
+        recorder.stop();
+        return;
+      }
+      try {
+        await recorder.start();
+        micBtn.setAttribute('data-recording', 'true');
+        askNote.textContent = 'Listening… tap the mic again when you finish.';
+      } catch (error) {
+        console.error(error);
+        askNote.textContent = 'Microphone permission was refused.';
+      }
+    });
+  }
 }
 
 init();

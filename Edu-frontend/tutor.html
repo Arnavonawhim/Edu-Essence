@@ -6,6 +6,10 @@
 <title>3D Vernacular Teacher · EduEssence</title>
 <meta name="description" content="Talk to the 3D vernacular teacher and hear the answer spoken back in your own language." />
 
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,400;1,9..144,500&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
 <script src="https://cdn.tailwindcss.com"></script>
 <script>
   tailwind.config = {
@@ -19,8 +23,8 @@
           plum:   '#1E1B24',
         },
         fontFamily: {
-          display: ['"Neue Haas Grotesk Display"', '"Helvetica Neue"', 'Arial', 'sans-serif'],
-          serif:   ['"Baskerville Italic"', '"Libre Baskerville"', 'Georgia', 'serif'],
+          display: ['"Plus Jakarta Sans"', '"Helvetica Neue"', 'Arial', 'sans-serif'],
+          serif:   ['Fraunces', 'Georgia', 'serif'],
         },
       }
     }
@@ -65,7 +69,13 @@
     </p>
   </section>
 
-  <section class="mt-12 grid md:grid-cols-[1fr_1.1fr] gap-8 items-start">
+  <div class="tutor-statusbar">
+    <span id="authPill" class="tutor-auth-pill" data-mode="checking">Checking your session…</span>
+    <span class="tutor-api-base">API <code id="apiBaseLabel">…</code></span>
+    <button type="button" id="signOutBtn" class="tutor-signout" hidden>Sign out</button>
+  </div>
+
+  <section class="mt-8 grid md:grid-cols-[1fr_1.1fr] gap-8 items-start">
 
     <div class="tutor-stage-frame">
       <div id="avatarViewport" class="tutor-stage"></div>

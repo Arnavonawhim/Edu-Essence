@@ -245,9 +245,9 @@ function selectMode(mode) {
 
   if (mode === 'offline') {
     // Redirect directly to your running React App server
-    window.location.href = 'http://localhost:5175/';
+    window.location.href = 'http://localhost:5173/';
   } else if (mode === 'online') {
-    console.log('Online Mode selected');
+    window.location.href = 'http://localhost:5175/';
   }
 }
 function goToOfflineMode() {
@@ -257,3 +257,28 @@ function goToOfflineMode() {
     : 'http://localhost:5173/';
   window.location.href = targetUrl;
 }
+function goToOnlineMode() {
+  const token = localStorage.getItem('access_token');
+  const targetUrl = token 
+    ? `http://localhost:5175/app/?token=${encodeURIComponent(token)}` 
+    : 'http://localhost:5175/app/';
+  window.location.href = targetUrl;
+}
+
+function goToTutor() {
+  const token = localStorage.getItem('access_token');
+  window.location.href = token
+    ? `tutor.html?token=${encodeURIComponent(token)}`
+    : 'tutor.html';
+}
+
+const teacherBtn = document.getElementById('teacherBtn');
+if (teacherBtn) {
+  teacherBtn.addEventListener('click', goToTutor);
+}
+
+const tutorLinks = document.querySelectorAll('[data-tutor-link]');
+tutorLinks.forEach((link) => link.addEventListener('click', (event) => {
+  event.preventDefault();
+  goToTutor();
+}));

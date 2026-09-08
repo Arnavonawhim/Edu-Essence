@@ -1,6 +1,12 @@
-export const API_BASE_URL = 'https://edu-essence.onrender.com';
+const LOCAL_API = 'http://127.0.0.1:8000';
+const HOSTED_API = 'https://edu-essence.onrender.com';
+const LOCAL_HOSTS = ['localhost', '127.0.0.1', '::1', ''];
 
-const TOKEN_KEYS = { access: 'accessToken', refresh: 'refreshToken' };
+export const API_BASE_URL = LOCAL_HOSTS.includes(window.location.hostname)
+  ? LOCAL_API
+  : HOSTED_API;
+
+const TOKEN_KEYS = { access: 'access_token', refresh: 'refresh_token' };
 
 export function getAccessToken() {
   return localStorage.getItem(TOKEN_KEYS.access);
@@ -11,13 +17,21 @@ export function getRefreshToken() {
 }
 
 export function setTokens(tokens) {
-  if (tokens?.access) localStorage.setItem(TOKEN_KEYS.access, tokens.access);
-  if (tokens?.refresh) localStorage.setItem(TOKEN_KEYS.refresh, tokens.refresh);
+  const access = tokens?.tokens?.access || tokens?.access;
+  const refresh = tokens?.tokens?.refresh || tokens?.refresh;
+  if (access) localStorage.setItem(TOKEN_KEYS.access, access);
+  if (refresh) localStorage.setItem(TOKEN_KEYS.refresh, refresh);
+  if (access) localStorage.setItem('isLoggedIn', 'true');
 }
 
 export function clearTokens() {
   localStorage.removeItem(TOKEN_KEYS.access);
   localStorage.removeItem(TOKEN_KEYS.refresh);
+  localStorage.removeItem('isLoggedIn');
+}
+
+export function isSignedIn() {
+  return Boolean(getAccessToken());
 }
 
 export class ApiError extends Error {
