@@ -1,27 +1,27 @@
 {
   "info": {
     "name": "EduEssence API",
-    "description": "Auth and live translation endpoints. Login stores the JWT automatically; creating a session stores its id.",
+    "description": "Run the folders top to bottom. Register teacher and Register student store their own JWTs, so teacher and student requests stay signed in at the same time.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
-  },
-  "auth": {
-    "type": "bearer",
-    "bearer": [{ "key": "token", "value": "{{access_token}}", "type": "string" }]
   },
   "variable": [
     { "key": "base_url", "value": "http://127.0.0.1:8000" },
-    { "key": "access_token", "value": "" },
+    { "key": "teacher_token", "value": "" },
+    { "key": "student_token", "value": "" },
+    { "key": "student2_token", "value": "" },
     { "key": "refresh_token", "value": "" },
     { "key": "session_id", "value": "" },
-    { "key": "email", "value": "teacher@example.com" },
+    { "key": "class_id", "value": "" },
+    { "key": "join_code", "value": "" },
+    { "key": "cursor", "value": "0" },
     { "key": "password", "value": "Str0ngPass!23" }
   ],
   "item": [
     {
-      "name": "Auth",
+      "name": "1 Auth",
       "item": [
         {
-          "name": "Register",
+          "name": "Register teacher",
           "event": [
             {
               "listen": "test",
@@ -30,8 +30,9 @@
                 "exec": [
                   "if (pm.response.code === 201) {",
                   "  const data = pm.response.json();",
-                  "  pm.collectionVariables.set('access_token', data.tokens.access);",
+                  "  pm.collectionVariables.set('teacher_token', data.tokens.access);",
                   "  pm.collectionVariables.set('refresh_token', data.tokens.refresh);",
+                  "  console.log('teacher role =', data.user.role);",
                   "}"
                 ]
               }
@@ -44,12 +45,64 @@
             "url": { "raw": "{{base_url}}/api/auth/register/", "host": ["{{base_url}}"], "path": ["api", "auth", "register", ""] },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"username\": \"teacher1\",\n  \"first_name\": \"Asha\",\n  \"last_name\": \"Verma\",\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\",\n  \"confirm_password\": \"{{password}}\"\n}"
+              "raw": "{\n  \"username\": \"asha_teacher\",\n  \"first_name\": \"Asha\",\n  \"last_name\": \"Verma\",\n  \"email\": \"asha@example.com\",\n  \"role\": \"teacher\",\n  \"password\": \"{{password}}\",\n  \"confirm_password\": \"{{password}}\"\n}"
             }
           }
         },
         {
-          "name": "Login",
+          "name": "Register student (Hindi listener)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  pm.collectionVariables.set('student_token', pm.response.json().tokens.access);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/api/auth/register/", "host": ["{{base_url}}"], "path": ["api", "auth", "register", ""] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"ravi_student\",\n  \"first_name\": \"Ravi\",\n  \"last_name\": \"Kumar\",\n  \"email\": \"ravi@example.com\",\n  \"role\": \"student\",\n  \"password\": \"{{password}}\",\n  \"confirm_password\": \"{{password}}\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Register student 2 (Marathi listener)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  pm.collectionVariables.set('student2_token', pm.response.json().tokens.access);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/api/auth/register/", "host": ["{{base_url}}"], "path": ["api", "auth", "register", ""] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"meera_student\",\n  \"first_name\": \"Meera\",\n  \"last_name\": \"Joshi\",\n  \"email\": \"meera@example.com\",\n  \"role\": \"student\",\n  \"password\": \"{{password}}\",\n  \"confirm_password\": \"{{password}}\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login as teacher",
           "event": [
             {
               "listen": "test",
@@ -58,7 +111,7 @@
                 "exec": [
                   "if (pm.response.code === 200) {",
                   "  const data = pm.response.json();",
-                  "  pm.collectionVariables.set('access_token', data.tokens.access);",
+                  "  pm.collectionVariables.set('teacher_token', data.tokens.access);",
                   "  pm.collectionVariables.set('refresh_token', data.tokens.refresh);",
                   "}"
                 ]
@@ -70,16 +123,38 @@
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "url": { "raw": "{{base_url}}/api/auth/login/", "host": ["{{base_url}}"], "path": ["api", "auth", "login", ""] },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}"
-            }
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"asha@example.com\",\n  \"password\": \"{{password}}\"\n}" }
           }
         },
         {
-          "name": "Me",
+          "name": "Login as student",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  pm.collectionVariables.set('student_token', pm.response.json().tokens.access);",
+                  "}"
+                ]
+              }
+            }
+          ],
           "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{base_url}}/api/auth/login/", "host": ["{{base_url}}"], "path": ["api", "auth", "login", ""] },
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"ravi@example.com\",\n  \"password\": \"{{password}}\"\n}" }
+          }
+        },
+        {
+          "name": "Me (teacher)",
+          "request": {
+            "auth": { "type": "noauth" },
             "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{teacher_token}}" }],
             "url": { "raw": "{{base_url}}/api/auth/me/", "host": ["{{base_url}}"], "path": ["api", "auth", "me", ""] }
           }
         },
@@ -93,7 +168,7 @@
                 "exec": [
                   "if (pm.response.code === 200) {",
                   "  const data = pm.response.json();",
-                  "  pm.collectionVariables.set('access_token', data.access);",
+                  "  pm.collectionVariables.set('teacher_token', data.access);",
                   "  if (data.refresh) { pm.collectionVariables.set('refresh_token', data.refresh); }",
                   "}"
                 ]
@@ -107,37 +182,329 @@
             "url": { "raw": "{{base_url}}/api/auth/token/refresh/", "host": ["{{base_url}}"], "path": ["api", "auth", "token", "refresh", ""] },
             "body": { "mode": "raw", "raw": "{\n  \"refresh\": \"{{refresh_token}}\"\n}" }
           }
-        },
+        }
+      ]
+    },
+    {
+      "name": "2 Online classroom",
+      "item": [
         {
-          "name": "Change password",
+          "name": "Teacher creates class",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const data = pm.response.json();",
+                  "  pm.collectionVariables.set('class_id', data.id);",
+                  "  pm.collectionVariables.set('join_code', data.join_code);",
+                  "  pm.collectionVariables.set('cursor', 0);",
+                  "  console.log('Join code:', data.join_code, '| room:', data.room_name);",
+                  "}"
+                ]
+              }
+            }
+          ],
           "request": {
+            "auth": { "type": "noauth" },
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "url": { "raw": "{{base_url}}/api/auth/change-password/", "host": ["{{base_url}}"], "path": ["api", "auth", "change-password", ""] },
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{teacher_token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/api/classroom/classes/", "host": ["{{base_url}}"], "path": ["api", "classroom", "classes", ""] },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"old_password\": \"{{password}}\",\n  \"password\": \"An0therPass!45\",\n  \"confirm_password\": \"An0therPass!45\"\n}"
+              "raw": "{\n  \"title\": \"Class 5 Science\",\n  \"subject\": \"Science\",\n  \"topic\": \"Photosynthesis\",\n  \"source_language\": \"en\"\n}"
             }
           }
         },
         {
-          "name": "Logout",
+          "name": "Student tries to create class (expect 403)",
           "request": {
+            "auth": { "type": "noauth" },
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "url": { "raw": "{{base_url}}/api/auth/logout/", "host": ["{{base_url}}"], "path": ["api", "auth", "logout", ""] },
-            "body": { "mode": "raw", "raw": "{\n  \"refresh\": \"{{refresh_token}}\"\n}" }
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{student_token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/api/classroom/classes/", "host": ["{{base_url}}"], "path": ["api", "classroom", "classes", ""] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Should be refused\",\n  \"source_language\": \"en\",\n  \"role\": \"teacher\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Teacher starts class",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{teacher_token}}" }],
+            "url": {
+              "raw": "{{base_url}}/api/classroom/classes/{{class_id}}/start/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "classroom", "classes", "{{class_id}}", "start", ""]
+            }
+          }
+        },
+        {
+          "name": "Student joins (Hindi)",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{student_token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/api/classroom/classes/join/", "host": ["{{base_url}}"], "path": ["api", "classroom", "classes", "join", ""] },
+            "body": { "mode": "raw", "raw": "{\n  \"join_code\": \"{{join_code}}\",\n  \"target_language\": \"hi\"\n}" }
+          }
+        },
+        {
+          "name": "Student 2 joins (Marathi)",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{student2_token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/api/classroom/classes/join/", "host": ["{{base_url}}"], "path": ["api", "classroom", "classes", "join", ""] },
+            "body": { "mode": "raw", "raw": "{\n  \"join_code\": \"{{join_code}}\",\n  \"target_language\": \"mr\"\n}" }
+          }
+        },
+        {
+          "name": "Class detail (who joined, which languages)",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{teacher_token}}" }],
+            "url": {
+              "raw": "{{base_url}}/api/classroom/classes/{{class_id}}/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "classroom", "classes", "{{class_id}}", ""]
+            }
+          }
+        },
+        {
+          "name": "Teacher video token (LiveKit)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const data = pm.response.json();",
+                  "  console.log('Open https://meet.livekit.io/?tab=custom and paste:');",
+                  "  console.log('URL:   ' + data.url);",
+                  "  console.log('Token: ' + data.token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{teacher_token}}" }],
+            "url": {
+              "raw": "{{base_url}}/api/classroom/classes/{{class_id}}/token/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "classroom", "classes", "{{class_id}}", "token", ""]
+            }
+          }
+        },
+        {
+          "name": "Student video token (LiveKit)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const data = pm.response.json();",
+                  "  console.log('Second browser tab, same room:');",
+                  "  console.log('URL:   ' + data.url);",
+                  "  console.log('Token: ' + data.token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{student_token}}" }],
+            "url": {
+              "raw": "{{base_url}}/api/classroom/classes/{{class_id}}/token/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "classroom", "classes", "{{class_id}}", "token", ""]
+            }
+          }
+        },
+        {
+          "name": "Teacher speaks (upload audio)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const data = pm.response.json();",
+                  "  console.log('Heard:   ' + data.original_text);",
+                  "  console.log('Latency: ' + data.latency_ms + 'ms for ' + data.translations.length + ' language(s)');",
+                  "  data.translations.forEach(function (t) {",
+                  "    console.log('[' + t.target_language + '] ' + t.translated_text);",
+                  "    if (t.audio_base64) {",
+                  "      console.log('data:' + t.audio_format + ';base64,' + t.audio_base64);",
+                  "    }",
+                  "  });",
+                  "} else if (pm.response.code === 409) {",
+                  "  console.log('No student is listening in another language yet.');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{teacher_token}}" }],
+            "url": {
+              "raw": "{{base_url}}/api/classroom/classes/{{class_id}}/utterances/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "classroom", "classes", "{{class_id}}", "utterances", ""]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "audio", "type": "file", "src": [], "description": "Pick sample_teacher_english.mp3 or your own recording" },
+                { "key": "speak", "value": "true", "type": "text" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Student polls stream (Hindi)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const data = pm.response.json();",
+                  "  pm.collectionVariables.set('cursor', data.cursor);",
+                  "  data.items.forEach(function (item) {",
+                  "    console.log('#' + item.sequence + ' [' + item.target_language + '] ' + item.translated_text);",
+                  "    if (item.audio_base64) {",
+                  "      console.log('data:' + item.audio_format + ';base64,' + item.audio_base64);",
+                  "    }",
+                  "  });",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{student_token}}" }],
+            "url": {
+              "raw": "{{base_url}}/api/classroom/classes/{{class_id}}/stream/?after={{cursor}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "classroom", "classes", "{{class_id}}", "stream", ""],
+              "query": [{ "key": "after", "value": "{{cursor}}" }]
+            }
+          }
+        },
+        {
+          "name": "Student 2 polls stream (Marathi)",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{student2_token}}" }],
+            "url": {
+              "raw": "{{base_url}}/api/classroom/classes/{{class_id}}/stream/?after=0",
+              "host": ["{{base_url}}"],
+              "path": ["api", "classroom", "classes", "{{class_id}}", "stream", ""],
+              "query": [{ "key": "after", "value": "0" }]
+            }
+          }
+        },
+        {
+          "name": "Student switches language",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{student_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/classroom/classes/{{class_id}}/language/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "classroom", "classes", "{{class_id}}", "language", ""]
+            },
+            "body": { "mode": "raw", "raw": "{\n  \"target_language\": \"bn\"\n}" }
+          }
+        },
+        {
+          "name": "Full transcript",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{teacher_token}}" }],
+            "url": {
+              "raw": "{{base_url}}/api/classroom/classes/{{class_id}}/transcript/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "classroom", "classes", "{{class_id}}", "transcript", ""]
+            }
+          }
+        },
+        {
+          "name": "Student leaves",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{student_token}}" }],
+            "url": {
+              "raw": "{{base_url}}/api/classroom/classes/{{class_id}}/leave/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "classroom", "classes", "{{class_id}}", "leave", ""]
+            }
+          }
+        },
+        {
+          "name": "Teacher ends class",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{teacher_token}}" }],
+            "url": {
+              "raw": "{{base_url}}/api/classroom/classes/{{class_id}}/end/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "classroom", "classes", "{{class_id}}", "end", ""]
+            }
           }
         }
       ]
     },
     {
-      "name": "Live Translation",
+      "name": "3 In person mode",
       "item": [
         {
           "name": "Languages",
           "request": {
+            "auth": { "type": "noauth" },
             "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{teacher_token}}" }],
             "url": { "raw": "{{base_url}}/api/translation/languages/", "host": ["{{base_url}}"], "path": ["api", "translation", "languages", ""] }
           }
         },
@@ -151,7 +518,6 @@
                 "exec": [
                   "if (pm.response.code === 200) {",
                   "  const data = pm.response.json();",
-                  "  console.log('Paste this into a browser tab to hear it:');",
                   "  console.log('data:' + data.audio_format + ';base64,' + data.audio_base64);",
                   "}"
                 ]
@@ -159,20 +525,25 @@
             }
           ],
           "request": {
+            "auth": { "type": "noauth" },
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{teacher_token}}" }
+            ],
             "url": { "raw": "{{base_url}}/api/translation/speech/", "host": ["{{base_url}}"], "path": ["api", "translation", "speech", ""] },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"text\": \"आज हम प्रकाश संश्लेषण के बारे में सीखेंगे\",\n  \"language\": \"hi\"\n}"
-            }
+            "body": { "mode": "raw", "raw": "{\n  \"text\": \"आज हम प्रकाश संश्लेषण के बारे में सीखेंगे\",\n  \"language\": \"hi\"\n}" }
           }
         },
         {
           "name": "Translate text",
           "request": {
+            "auth": { "type": "noauth" },
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{teacher_token}}" }
+            ],
             "url": { "raw": "{{base_url}}/api/translation/translate/", "host": ["{{base_url}}"], "path": ["api", "translation", "translate", ""] },
             "body": {
               "mode": "raw",
@@ -196,8 +567,12 @@
             }
           ],
           "request": {
+            "auth": { "type": "noauth" },
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{teacher_token}}" }
+            ],
             "url": { "raw": "{{base_url}}/api/translation/sessions/", "host": ["{{base_url}}"], "path": ["api", "translation", "sessions", ""] },
             "body": {
               "mode": "raw",
@@ -206,7 +581,7 @@
           }
         },
         {
-          "name": "Send utterance (audio file)",
+          "name": "Send utterance",
           "event": [
             {
               "listen": "test",
@@ -217,19 +592,18 @@
                   "  const data = pm.response.json();",
                   "  console.log('Heard:      ' + data.chunk.original_text);",
                   "  console.log('Translated: ' + data.chunk.translated_text);",
-                  "  console.log('Latency:    ' + data.chunk.latency_ms + 'ms');",
                   "  if (data.audio_base64) {",
                   "    console.log('data:' + data.audio_format + ';base64,' + data.audio_base64);",
                   "  }",
-                  "} else if (pm.response.code === 204) {",
-                  "  console.log('No speech detected in that clip.');",
                   "}"
                 ]
               }
             }
           ],
           "request": {
+            "auth": { "type": "noauth" },
             "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{teacher_token}}" }],
             "url": {
               "raw": "{{base_url}}/api/translation/sessions/{{session_id}}/utterances/",
               "host": ["{{base_url}}"],
@@ -238,34 +612,18 @@
             "body": {
               "mode": "formdata",
               "formdata": [
-                { "key": "audio", "type": "file", "src": [], "description": "Pick a recorded clip: wav, mp3, m4a, webm or ogg" },
+                { "key": "audio", "type": "file", "src": [] },
                 { "key": "speak", "value": "true", "type": "text" }
               ]
             }
           }
         },
         {
-          "name": "Session with transcript",
-          "request": {
-            "method": "GET",
-            "url": {
-              "raw": "{{base_url}}/api/translation/sessions/{{session_id}}/",
-              "host": ["{{base_url}}"],
-              "path": ["api", "translation", "sessions", "{{session_id}}", ""]
-            }
-          }
-        },
-        {
-          "name": "List sessions",
-          "request": {
-            "method": "GET",
-            "url": { "raw": "{{base_url}}/api/translation/sessions/", "host": ["{{base_url}}"], "path": ["api", "translation", "sessions", ""] }
-          }
-        },
-        {
           "name": "End session",
           "request": {
+            "auth": { "type": "noauth" },
             "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{teacher_token}}" }],
             "url": {
               "raw": "{{base_url}}/api/translation/sessions/{{session_id}}/end/",
               "host": ["{{base_url}}"],

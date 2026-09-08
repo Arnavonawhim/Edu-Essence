@@ -147,3 +147,6 @@ class UtteranceTranslation(models.Model):
 
     def __str__(self):
         return f'{self.utterance_id} to {self.target_language}'
+
+
+CLASS_STATUS_CHOICES = LiveClass.Status.choices

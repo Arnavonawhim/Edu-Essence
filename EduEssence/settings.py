@@ -33,11 +33,24 @@ SECRET_KEY = os.environ.get(
 
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = [
-    host.strip()
-    for host in os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
-    if host.strip()
-]
+ENV_LIST_NOISE = '[]\'" '
+
+
+def _split_env(name, default=''):
+    raw = os.environ.get(name, default).strip().strip(ENV_LIST_NOISE)
+    items = [item.strip(ENV_LIST_NOISE) for item in raw.split(',')]
+    return [item for item in items if item]
+
+
+def _as_host(value):
+    return value.split('//')[-1].split('/')[0].split(':')[0]
+
+
+def _as_origin(value):
+    return value.rstrip('/')
+
+
+ALLOWED_HOSTS = [_as_host(host) for host in _split_env('ALLOWED_HOSTS', 'localhost,127.0.0.1')]
 
 RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
 if RENDER_EXTERNAL_HOSTNAME:
@@ -45,11 +58,7 @@ if RENDER_EXTERNAL_HOSTNAME:
 
 CSRF_TRUSTED_ORIGINS = [f'https://{host}' for host in ALLOWED_HOSTS if '.' in host]
 
-CORS_ALLOWED_ORIGINS = [
-    origin.strip()
-    for origin in os.environ.get('CORS_ALLOWED_ORIGINS', '').split(',')
-    if origin.strip()
-]
+CORS_ALLOWED_ORIGINS = [_as_origin(origin) for origin in _split_env('CORS_ALLOWED_ORIGINS')]
 
 
 # Application definition
@@ -68,6 +77,7 @@ INSTALLED_APPS = [
     'drf_spectacular',
     'Auth',
     'Translation',
+    'Classroom',
 ]
 
 AUTH_USER_MODEL = 'user_auth.User'
@@ -101,7 +111,7 @@ SIMPLE_JWT = {
 
 GROQ_API_KEY = os.environ.get('GROQ_API_KEY', '')
 GROQ_STT_MODEL = os.environ.get('GROQ_STT_MODEL', 'whisper-large-v3-turbo')
-GROQ_TRANSLATION_MODEL = os.environ.get('GROQ_TRANSLATION_MODEL', 'llama-3.3-70b-versatile')
+GROQ_TRANSLATION_MODEL = os.environ.get('GROQ_TRANSLATION_MODEL', 'qwen/qwen3.8-27b')
 
 SARVAM_API_KEY = os.environ.get('SARVAM_API_KEY', '')
 SARVAM_STT_MODEL = os.environ.get('SARVAM_STT_MODEL', 'saarika:v2')
@@ -112,6 +122,13 @@ SARVAM_TTS_SPEAKER = os.environ.get('SARVAM_TTS_SPEAKER', 'anushka')
 STT_PROVIDER = os.environ.get('STT_PROVIDER', 'groq')
 TRANSLATION_PROVIDER = os.environ.get('TRANSLATION_PROVIDER', 'groq')
 TTS_PROVIDER = os.environ.get('TTS_PROVIDER', 'google')
+
+LIVEKIT_URL = os.environ.get('LIVEKIT_URL', '')
+LIVEKIT_API_KEY = os.environ.get('LIVEKIT_API_KEY', '')
+LIVEKIT_API_SECRET = os.environ.get('LIVEKIT_API_SECRET', '')
+LIVEKIT_TOKEN_TTL = int(os.environ.get('LIVEKIT_TOKEN_TTL', '21600'))
+
+CLASS_STREAM_PAGE_SIZE = int(os.environ.get('CLASS_STREAM_PAGE_SIZE', '20'))
 
 PROVIDER_TIMEOUT = int(os.environ.get('PROVIDER_TIMEOUT', '20'))
 MAX_UTTERANCE_BYTES = int(os.environ.get('MAX_UTTERANCE_BYTES', str(6 * 1024 * 1024)))
@@ -129,6 +146,9 @@ SPECTACULAR_SETTINGS = {
     'SORT_OPERATIONS': False,
     'ENUM_NAME_OVERRIDES': {
         'LanguageEnum': 'Translation.languages.LANGUAGE_CHOICES',
+        'SessionStatusEnum': 'Translation.models.SESSION_STATUS_CHOICES',
+        'SessionModeEnum': 'Translation.models.SESSION_MODE_CHOICES',
+        'ClassStatusEnum': 'Classroom.models.CLASS_STATUS_CHOICES',
     },
 }
 

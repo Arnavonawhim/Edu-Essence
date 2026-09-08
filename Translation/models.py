@@ -69,3 +69,7 @@ class TranscriptChunk(models.Model):
 
     def __str__(self):
         return f'{self.session_id} #{self.sequence}'
+
+
+SESSION_STATUS_CHOICES = TeachingSession.Status.choices
+SESSION_MODE_CHOICES = TeachingSession.Mode.choices
