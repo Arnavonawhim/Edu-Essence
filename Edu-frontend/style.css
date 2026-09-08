@@ -1,0 +1,56 @@
+html { scroll-behavior: smooth; }
+  body { background: #EBE1C6; }
+
+  ::selection { background: #1F2421; color: #FFF8D3; }
+
+  .focus-ring:focus-visible {
+    outline: 2px solid #1F2421;
+    outline-offset: 3px;
+  }
+
+  /* Sticky stacked-card scroll system */
+  .stack-wrap { position: relative; }
+  .stack-pin {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+    display: flex;
+    flex-direction: column;
+    will-change: transform;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .float-slow { animation: floaty 7s ease-in-out infinite; }
+    .float-slow-rev { animation: floaty-rev 8.5s ease-in-out infinite; }
+    .float-slower { animation: floaty 9.5s ease-in-out infinite; }
+  }
+  @keyframes floaty {
+    0%, 100% { transform: translateY(0) rotate(var(--r, -3deg)); }
+    50% { transform: translateY(-14px) rotate(var(--r, -3deg)); }
+  }
+  @keyframes floaty-rev {
+    0%, 100% { transform: translateY(0) rotate(var(--r, 4deg)); }
+    50% { transform: translateY(12px) rotate(var(--r, 4deg)); }
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  .reveal.in {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+
+  .grain {
+    background-image: radial-gradient(circle at 1px 1px, rgba(31,36,33,0.06) 1px, transparent 0);
+    background-size: 18px 18px;
+  }
+
+  .switch-track { transition: background-color .25s ease; }
+  .switch-dot { transition: transform .25s ease; }
+
+  .chip { transition: background-color .2s ease, color .2s ease, border-color .2s ease; }
+
+  textarea, input { font-family: inherit; }
