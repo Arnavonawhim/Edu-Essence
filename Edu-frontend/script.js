@@ -28,11 +28,6 @@
     iconClose.classList.add('hidden');
   }));
 
-  // hero entrance reveal
-  document.querySelectorAll('[data-reveal]').forEach((el, i) => {
-    requestAnimationFrame(() => setTimeout(() => el.classList.add('in'), 80 + i * 90));
-  });
-
   // dialect chip selection
   document.querySelectorAll('[data-chip]').forEach(chip => {
     chip.addEventListener('click', () => {
