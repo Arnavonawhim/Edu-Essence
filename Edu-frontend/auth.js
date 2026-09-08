@@ -1,5 +1,15 @@
 const AUTH_API_BASE_URL = 'https://edu-essence.onrender.com';
 
+// Opening the page as a file sends `Origin: null`, which the API rejects, so the
+// request never leaves the browser and looks like an unreachable server.
+function networkErrorMessage(err) {
+  console.error('Auth request failed:', err);
+  if (window.location.protocol === 'file:') {
+    return 'Open the site at http://localhost:5175 — logging in does not work from a file:// page.';
+  }
+  return 'Server is unreachable. On the Render free tier it may need 60s to wake up.';
+}
+
 const authModal = document.getElementById('authModal');
 const loginPanel = document.getElementById('loginPanel');
 const registerPanel = document.getElementById('registerPanel');
@@ -184,7 +194,7 @@ loginForm.addEventListener('submit', async (event) => {
       showError(loginPassword, loginPasswordError, message);
     }
   } catch (err) {
-    setNote(loginNote, 'Server is unreachable. On the Render free tier it may need 60s to wake up.', false);
+    setNote(loginNote, networkErrorMessage(err), false);
   } finally {
     loginSubmitBtn.disabled = false;
     loginSubmitBtn.textContent = 'Login';
@@ -272,7 +282,7 @@ registerForm.addEventListener('submit', async (event) => {
       if (data.detail) setNote(registerNote, firstMessage(data.detail), false);
     }
   } catch (err) {
-    setNote(registerNote, 'Server is unreachable. On the Render free tier it may need 60s to wake up.', false);
+    setNote(registerNote, networkErrorMessage(err), false);
   } finally {
     registerSubmitBtn.disabled = false;
     registerSubmitBtn.textContent = 'Create Account';
