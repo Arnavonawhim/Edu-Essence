@@ -87,9 +87,9 @@ html.lenis, html.lenis body { height: auto; }
   transition: transform 0.35s var(--ease-out), background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
 .btn-primary { background: var(--ink); color: var(--beam); }
-.btn-primary:hover { background: #1E1B24; transform: translateY(-2px); }
+/*.btn-primary:hover { background: #1E1B24; transform: translateY(-2px); }*/
 .btn-ghost { border: 1px solid rgba(31, 36, 33, 0.28); color: var(--ink); }
-.btn-ghost:hover { background: var(--ink); color: var(--beam); border-color: var(--ink); transform: translateY(-2px); }
+/*.btn-ghost:hover { background: var(--ink); color: var(--beam); border-color: var(--ink); transform: translateY(-2px); }*/
 
 .card-soft {
   background: var(--beam);
