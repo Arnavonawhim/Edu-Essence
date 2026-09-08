@@ -224,6 +224,11 @@ function selectMode(mode) {
   if (popup) popup.classList.add('hidden');
   if (chevron) chevron.style.transform = 'rotate(0deg)';
 
-  // Action based on selected mode
+  // Online mode hands off to the React flow served from the same origin at /app
+  if (mode === 'Online') {
+    window.location.href = '/app/join';
+    return;
+  }
+
   alert(`Selected: ${mode} Mode`);
 }
