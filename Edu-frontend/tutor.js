@@ -8,7 +8,7 @@ import {
   getAccessToken,
   isSignedIn,
   setTokens,
-} from 'api.js';
+} from './api.js';
 
 const AVATAR_MODEL_PATH = 'assets/teacher.glb';
 const TUTOR_TURN_ENDPOINT = null;
@@ -202,6 +202,14 @@ const TutorAvatar = (() => {
   function setAmplitude(value) {
     currentAmplitude = Math.min(1, Math.max(0, value));
   }
+
+  window.__tutorAvatar = {
+    setAmplitude,
+    mouthCount: () => mouths.length,
+    influence: () => (mouths.length ? mouths[0].mesh.morphTargetInfluences[mouths[0].index] : null),
+    targetNames: () => mouths.map(({ mesh, index }) =>
+      Object.keys(mesh.morphTargetDictionary).find((k) => mesh.morphTargetDictionary[k] === index)),
+  };
 
   return { init, setAmplitude, hasMouthRig: () => mouths.length > 0 };
 })();

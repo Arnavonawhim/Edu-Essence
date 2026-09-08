@@ -1,10 +1,18 @@
-const LOCAL_API = 'http://127.0.0.1:8000';
 const HOSTED_API = 'https://edu-essence.onrender.com';
-const LOCAL_HOSTS = ['localhost', '127.0.0.1', '::1', ''];
+const LOCAL_API = 'http://127.0.0.1:8000';
 
-export const API_BASE_URL = LOCAL_HOSTS.includes(window.location.hostname)
-  ? LOCAL_API
-  : HOSTED_API;
+function resolveApiBase() {
+  const requested = new URLSearchParams(window.location.search).get('api');
+  if (requested) {
+    localStorage.setItem('api_base', requested);
+  }
+  const choice = requested || localStorage.getItem('api_base') || 'hosted';
+  if (choice === 'local') return LOCAL_API;
+  if (choice === 'hosted') return HOSTED_API;
+  return choice.replace(/\/$/, '');
+}
+
+export const API_BASE_URL = resolveApiBase();
 
 const TOKEN_KEYS = { access: 'access_token', refresh: 'refresh_token' };
 
