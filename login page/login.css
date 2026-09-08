@@ -1,0 +1,202 @@
+:root {
+  --color-lilac-ash: #C7B4D8;
+  --color-mellow-beam: #FFF8D3;
+  --color-dark: #1F1B24;
+  --color-muted: #5E5866;
+  --color-border: rgba(199, 180, 216, 0.5);
+  --color-error: #B3261E;
+
+  --font-display: "Plus Jakarta Sans", "Helvetica Neue", Arial, sans-serif;
+  --font-editorial: "Libre Baskerville", "Baskerville", Georgia, serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  background-color: var(--color-mellow-beam);
+  color: var(--color-dark);
+  font-family: var(--font-editorial);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Covers the whole screen */
+.auth-wrapper {
+  min-height: 100vh;
+  width: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background-color: var(--color-mellow-beam);
+}
+
+/* Centered authentication box */
+.auth-card {
+  width: 100%;
+  max-width: 420px;
+  background-color: #FFFFFF;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 2.75rem 2.25rem;
+  box-shadow: 0 12px 32px rgba(199, 180, 216, 0.28);
+}
+
+.auth-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.brand-title {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--color-dark);
+  letter-spacing: -0.02em;
+  margin-bottom: 0.4rem;
+}
+
+.brand-subtitle {
+  font-family: var(--font-editorial);
+  font-style: arial;
+  font-size: 0.92rem;
+  color: var(--color-muted);
+}
+
+.form-group {
+  margin-bottom: 1.25rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-family: var(--font-editorial);
+  font-style: arial;
+  font-size: 0.85rem;
+  margin-bottom: 0.35rem;
+  color: var(--color-dark);
+}
+
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-wrapper input {
+  width: 100%;
+  padding: 0.8rem 0.9rem;
+  font-family: var(--font-editorial);
+  font-size: 0.92rem;
+  border-radius: 6px;
+  border: 1px solid var(--color-border);
+  background-color: #FAFAFA;
+  color: var(--color-dark);
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.input-wrapper input:focus {
+  border-color: var(--color-lilac-ash);
+  box-shadow: 0 0 0 3px rgba(199, 180, 216, 0.35);
+  background-color: #FFFFFF;
+}
+
+.input-wrapper input.input-invalid {
+  border-color: var(--color-error);
+}
+
+.password-toggle-btn {
+  position: absolute;
+  right: 0.75rem;
+  background: none;
+  border: none;
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-muted);
+  cursor: pointer;
+}
+
+.field-error {
+  min-height: 1.1rem;
+  font-family: var(--font-editorial);
+  font-style: arial;
+  font-size: 0.76rem;
+  color: var(--color-error);
+  margin-top: 0.25rem;
+}
+
+.btn-submit {
+  width: 100%;
+  padding: 0.85rem;
+  margin-top: 0.5rem;
+  background-color: var(--color-lilac-ash);
+  border: none;
+  border-radius: 6px;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-dark);
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.btn-submit:hover {
+  opacity: 0.92;
+}
+
+.btn-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.auth-footer {
+  text-align: center;
+  margin-top: 1.75rem;
+}
+
+.auth-footer p {
+  font-family: var(--font-editorial);
+  font-style: arial;
+  font-size: 0.85rem;
+  color: var(--color-muted);
+}
+
+.auth-footer a {
+  color: var(--color-dark);
+  text-decoration: underline;
+  font-weight: 700;
+  font-style: normal;
+  margin-left: 0.2rem;
+}
+/* Required indicator symbol */
+.required-star {
+  color: var(--color-error);
+  font-weight: bold;
+  margin-left: 0.15rem;
+}
+
+/* Two-column layout for First Name and Last Name */
+.name-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+@media (max-width: 440px) {
+  .name-grid {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+}
