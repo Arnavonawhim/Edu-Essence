@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>BhashaShiksha — Learning that speaks your language</title>
+<title>EduEssence</title>
 <meta name="description" content="An AI-powered vernacular pedagogy and real-time translation tool for mother-tongue primary education." />
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -40,6 +40,7 @@
 </script>
 
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="auth.css">
 </head>
 
 <body class="font-sans text-slate antialiased">
@@ -336,8 +337,130 @@
   <div class="border-t border-beam/10 py-6 text-center text-xs text-beam/40">© 2026 BhashaShiksha. Built for classrooms, not boardrooms.</div>
 </footer>
 
+
+<!-- ============ AUTH MODAL (login + register) ============ -->
+<div id="authModal" class="auth-modal" hidden role="dialog" aria-modal="true" aria-labelledby="authTitle">
+  <div class="auth-card">
+    <button type="button" id="authCloseBtn" class="auth-close" aria-label="Close">&times;</button>
+
+    <!-- ---------- LOGIN PANEL ---------- -->
+    <section id="loginPanel" class="auth-panel">
+      <header class="auth-header">
+        <h1 class="brand-title" id="authTitle">Edu-Essence</h1>
+        <p class="brand-subtitle">Welcome back to your learning space</p>
+      </header>
+
+      <form id="loginForm" novalidate>
+        <div class="form-group">
+          <label for="loginEmail">Email</label>
+          <div class="input-wrapper">
+            <input type="email" id="loginEmail" name="email" placeholder="name@example.com" autocomplete="email" required />
+          </div>
+          <span class="field-error" id="loginEmailError"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="loginPassword">Password</label>
+          <div class="input-wrapper">
+            <input type="password" id="loginPassword" name="password" placeholder="Enter your password" autocomplete="current-password" required />
+            <button type="button" id="loginTogglePassword" class="password-toggle-btn" aria-label="Toggle password visibility">Show</button>
+          </div>
+          <span class="field-error" id="loginPasswordError"></span>
+        </div>
+
+        <p class="form-note" id="loginNote"></p>
+
+        <button type="submit" id="loginSubmitBtn" class="btn-submit">Login</button>
+      </form>
+
+      <footer class="auth-footer">
+        <p>Don't have an account?
+          <button type="button" id="goToRegister" class="auth-switch">Create an account</button>
+        </p>
+      </footer>
+    </section>
+
+    <!-- ---------- REGISTER PANEL ---------- -->
+    <section id="registerPanel" class="auth-panel" hidden>
+      <header class="auth-header">
+        <h1 class="brand-title">Edu-Essence</h1>
+        <p class="brand-subtitle">Begin your academic journey</p>
+      </header>
+
+      <form id="registerForm" novalidate>
+        <div class="name-grid">
+          <div class="form-group">
+            <label for="regFirstName">First Name <span class="required-star">*</span></label>
+            <div class="input-wrapper">
+              <input type="text" id="regFirstName" name="firstName" placeholder="John" autocomplete="given-name" required />
+            </div>
+            <span class="field-error" id="regFirstNameError"></span>
+          </div>
+
+          <div class="form-group">
+            <label for="regLastName">Last Name</label>
+            <div class="input-wrapper">
+              <input type="text" id="regLastName" name="lastName" placeholder="Doe" autocomplete="family-name" />
+            </div>
+            <span class="field-error" id="regLastNameError"></span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="regEmail">Email <span class="required-star">*</span></label>
+          <div class="input-wrapper">
+            <input type="email" id="regEmail" name="email" placeholder="name@example.com" autocomplete="email" required />
+          </div>
+          <span class="field-error" id="regEmailError"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="regRole">I am a <span class="required-star">*</span></label>
+          <div class="input-wrapper">
+            <select id="regRole" name="role">
+              <option value="student" selected>Student</option>
+              <option value="teacher">Teacher</option>
+            </select>
+          </div>
+          <span class="field-error" id="regRoleError"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="regPassword">Password <span class="required-star">*</span></label>
+          <div class="input-wrapper">
+            <input type="password" id="regPassword" name="password" placeholder="At least 8 characters" autocomplete="new-password" required />
+            <button type="button" id="regTogglePassword" class="password-toggle-btn" aria-label="Toggle password visibility">Show</button>
+          </div>
+          <span class="field-error" id="regPasswordError"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="regConfirmPassword">Confirm Password <span class="required-star">*</span></label>
+          <div class="input-wrapper">
+            <input type="password" id="regConfirmPassword" name="confirmPassword" placeholder="Re-enter password" autocomplete="new-password" required />
+            <button type="button" id="regToggleConfirmPassword" class="password-toggle-btn" aria-label="Toggle confirm password visibility">Show</button>
+          </div>
+          <span class="field-error" id="regConfirmPasswordError"></span>
+        </div>
+
+        <p class="form-note" id="registerNote"></p>
+
+        <button type="submit" id="registerSubmitBtn" class="btn-submit">Create Account</button>
+      </form>
+
+      <footer class="auth-footer">
+        <p>Already have an account?
+          <button type="button" id="goToLogin" class="auth-switch">Login</button>
+        </p>
+      </footer>
+    </section>
+
+  </div>
+</div>
+
 <script src="script.js"></script>
 <script src="scroll.js"></script>
+<script src="auth.js"></script>
 
 <script type="module">
   import Lenis from 'lenis';
