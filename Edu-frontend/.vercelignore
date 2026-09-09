@@ -1,0 +1,7 @@
+# This project deploys Edu-frontend/ as plain static files (no build step).
+# The React app under react-sample/ is its own Vercel project — don't ship its
+# source or dependencies here.
+node_modules
+react-sample
+*.zip
+.DS_Store
