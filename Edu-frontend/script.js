@@ -249,13 +249,20 @@ function selectMode(mode) {
     window.location.href = CLASSROOM_URL;
   }
 }
-/* In production all three frontends are one Vercel project, so these are plain
-   same-origin paths. Locally the translator runs on its own vite server; the
-   classroom needs no special case because react-sample's vite already serves
-   this static site at root on :5175. */
-const ON_VITE_DEV = window.location.port === '5175';
-const TRANSLATOR_URL = ON_VITE_DEV ? 'http://localhost:5173/translator/' : '/translator/';
-const CLASSROOM_URL = '/app/';
+/* Each frontend is its own Vercel project, so production links are absolute.
+   Served from any localhost origin we point at the local vite dev servers
+   instead, so the same build works in both places. */
+const IS_LOCAL = ['localhost', '127.0.0.1', '::1'].includes(window.location.hostname);
+
+/* Offline mode — the real-time translator. */
+const TRANSLATOR_URL = IS_LOCAL
+  ? 'http://localhost:5173/'
+  : 'https://edu-essencee.vercel.app/';
+
+/* Online mode — the LiveKit classroom. */
+const CLASSROOM_URL = IS_LOCAL
+  ? 'http://localhost:5175/app/'
+  : 'https://edu-essence2.vercel.app/';
 
 function goToOfflineMode() {
   const token = localStorage.getItem('access_token');

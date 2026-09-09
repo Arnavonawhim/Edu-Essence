@@ -3,7 +3,6 @@ import { defineConfig } from 'vite'
 
 // https://vite.dev/config/
 export default defineConfig({
-  /* served under /translator/ on the unified Vercel deploy */
-  base: '/translator/',
+  /* deployed as its own Vercel project, so it lives at that domain's root */
   plugins: [react()],
 })
