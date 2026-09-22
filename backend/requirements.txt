@@ -11,3 +11,5 @@ requests==2.33.1
 python-dotenv==1.2.2
 gTTS==2.5.4
 PyJWT==2.10.1
+yt-dlp[default]
+    
