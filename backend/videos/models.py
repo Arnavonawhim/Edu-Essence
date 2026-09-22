@@ -36,6 +36,7 @@ class DubbingJob(models.Model):
 
     source_language = models.CharField(max_length=10, choices=SOURCE_LANGUAGE_CHOICES, blank=True)
     detected_language = models.CharField(max_length=10, blank=True)
+    language_probability = models.FloatField(null=True, blank=True)
     diarize = models.BooleanField(default=True)
     clone_voices = models.BooleanField(default=True)
     min_speakers = models.PositiveSmallIntegerField(null=True, blank=True)
@@ -47,10 +48,13 @@ class DubbingJob(models.Model):
     progress_message = models.CharField(max_length=255, blank=True)
     error_message = models.TextField(blank=True)
 
-    # Paths are relative to MEDIA_ROOT and written by the pipeline, never uploaded.
     source_video = models.FileField(max_length=500, blank=True)
     speech_audio = models.FileField(max_length=500, blank=True)
     output_video = models.FileField(max_length=500, blank=True)
+
+    asr_model = models.CharField(max_length=50, blank=True)
+    word_aligned = models.BooleanField(default=False)
+    transcribed_until = models.FloatField(default=0)
 
     stage_timings = models.JSONField(default=dict, blank=True)
 
@@ -74,13 +78,48 @@ class DubbingJob(models.Model):
 
     @property
     def can_retry(self):
-        return self.status in (self.Status.FAILED, self.Status.CANCELLED)
+        return self.status in (self.Status.COMPLETED, self.Status.FAILED, self.Status.CANCELLED)
+
+    @property
+    def transcript_language(self):
+        return self.source_language or self.detected_language
 
     @property
     def processing_seconds(self):
         if not (self.started_at and self.finished_at):
             return None
         return round((self.finished_at - self.started_at).total_seconds(), 1)
+
+
+class Segment(models.Model):
+    job = models.ForeignKey(
+        DubbingJob,
+        on_delete=models.CASCADE,
+        related_name='segments',
+    )
+    index = models.PositiveIntegerField()
+    start = models.FloatField()
+    end = models.FloatField()
+    text = models.TextField()
+    words = models.JSONField(default=list, blank=True)
+    confidence = models.FloatField(null=True, blank=True)
+
+    class Meta:
+        db_table = 'dubbing_segments'
+        ordering = ['index']
+        constraints = [
+            models.UniqueConstraint(
+                fields=['job', 'index'],
+                name='unique_segment_index_per_job',
+            )
+        ]
+
+    def __str__(self):
+        return f'{self.job_id} #{self.index} [{self.start:.2f}-{self.end:.2f}]'
+
+    @property
+    def duration(self):
+        return round(self.end - self.start, 3)
 
 
 JOB_STATUS_CHOICES = DubbingJob.Status.choices

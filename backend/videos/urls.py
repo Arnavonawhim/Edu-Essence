@@ -6,6 +6,8 @@ from videos.views import (
     JobFileView,
     JobListCreateView,
     JobRetryView,
+    JobSegmentListView,
+    JobTranscriptView,
     LanguageListView,
 )
 
@@ -18,4 +20,6 @@ urlpatterns = [
     path('jobs/<int:job_id>/cancel/', JobCancelView.as_view(), name='job-cancel'),
     path('jobs/<int:job_id>/retry/', JobRetryView.as_view(), name='job-retry'),
     path('jobs/<int:job_id>/files/<str:kind>/', JobFileView.as_view(), name='job-file'),
+    path('jobs/<int:job_id>/segments/', JobSegmentListView.as_view(), name='job-segments'),
+    path('jobs/<int:job_id>/transcript/', JobTranscriptView.as_view(), name='job-transcript'),
 ]

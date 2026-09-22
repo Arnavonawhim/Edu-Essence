@@ -1,14 +1,17 @@
 import logging
 import time
 
+from django.conf import settings
 from django.utils import timezone
 
 from videos.models import DubbingJob
+from videos.pipeline import model_cache
 from videos.pipeline.audio import extract_speech_audio
 from videos.pipeline.download import download_video
 from videos.pipeline.exceptions import JobCancelled, PipelineError
 from videos.pipeline.ffmpeg import require_binaries
 from videos.pipeline.progress import ProgressReporter
+from videos.pipeline.transcribe import transcribe_speech
 from videos.pipeline.workspace import JobWorkspace
 
 logger = logging.getLogger('videos.pipeline')
@@ -17,6 +20,7 @@ Stage = DubbingJob.Stage
 PIPELINE = [
     (Stage.DOWNLOAD, download_video, 15),
     (Stage.EXTRACT_AUDIO, extract_speech_audio, 5),
+    (Stage.TRANSCRIBE, transcribe_speech, 35),
 ]
 
 
@@ -65,6 +69,9 @@ def run_job(job):
             started = time.monotonic()
             run_stage(job, workspace, reporter)
             _record_timing(job, stage, time.monotonic() - started)
+
+            if not settings.DUBBING_KEEP_MODELS_LOADED:
+                model_cache.release()
 
     except JobCancelled:
         _finish(job)

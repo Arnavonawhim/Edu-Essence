@@ -1,5 +1,6 @@
 import shutil
 from pathlib import Path
+
 from django.conf import settings
 
 
@@ -9,6 +10,7 @@ class JobWorkspace:
         self.audio_dir = self.root / 'audio'
         self.work_dir = self.root / 'work'
         self.output_dir = self.root / 'output'
+        self.drafts_dir = self.work_dir / 'transcript_drafts'
 
     @property
     def download_template(self):
@@ -18,8 +20,11 @@ class JobWorkspace:
     def speech_audio(self):
         return self.audio_dir / 'speech_16k.wav'
 
+    def draft_path(self, window_start):
+        return self.drafts_dir / f'window_{round(window_start * 1000):09d}.json'
+
     def ensure(self):
-        for folder in (self.root, self.audio_dir, self.work_dir, self.output_dir):
+        for folder in (self.root, self.audio_dir, self.work_dir, self.output_dir, self.drafts_dir):
             folder.mkdir(parents=True, exist_ok=True)
 
     def delete(self):

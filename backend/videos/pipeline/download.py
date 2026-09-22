@@ -2,9 +2,9 @@ import shutil
 from pathlib import Path
 
 from django.conf import settings
-
 from yt_dlp import YoutubeDL
 from yt_dlp.utils import DownloadError
+
 from videos.pipeline.exceptions import PipelineError
 from videos.pipeline.ffmpeg import probe_duration
 from videos.pipeline.workspace import JobWorkspace
@@ -82,7 +82,6 @@ def download_video(job, workspace, reporter):
             requested = info.get('requested_formats') or [info]
             ydl.add_progress_hook(_DownloadProgress(reporter, requested))
 
-            # Reuses the metadata we already have instead of a second request.
             info = ydl.process_ie_result(info, download=True)
     except DownloadError as error:
         raise PipelineError(f'yt-dlp could not download the video: {_clean(error)}') from error

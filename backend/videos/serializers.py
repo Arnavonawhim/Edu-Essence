@@ -4,7 +4,7 @@ from django.urls import reverse
 from rest_framework import serializers
 
 from videos.languages import SOURCE_LANGUAGES
-from videos.models import DubbingJob
+from videos.models import DubbingJob, Segment
 
 YOUTUBE_HOSTS = {
     'youtube.com',
@@ -73,8 +73,27 @@ class DubbingJobCreateSerializer(serializers.ModelSerializer):
         )
 
 
+class SegmentSerializer(serializers.ModelSerializer):
+    duration = serializers.FloatField(read_only=True)
+
+    class Meta:
+        model = Segment
+        fields = [
+            'id',
+            'index',
+            'start',
+            'end',
+            'duration',
+            'text',
+            'confidence',
+            'words',
+        ]
+        read_only_fields = fields
+
+
 class DubbingJobSerializer(serializers.ModelSerializer):
     processing_seconds = serializers.FloatField(read_only=True, allow_null=True)
+    segment_count = serializers.IntegerField(read_only=True, source='segments.count')
     files = serializers.SerializerMethodField()
 
     class Meta:
@@ -88,6 +107,11 @@ class DubbingJobSerializer(serializers.ModelSerializer):
             'duration_seconds',
             'source_language',
             'detected_language',
+            'language_probability',
+            'asr_model',
+            'word_aligned',
+            'transcribed_until',
+            'segment_count',
             'diarize',
             'clone_voices',
             'min_speakers',
@@ -107,7 +131,6 @@ class DubbingJobSerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
     def get_files(self, job) -> dict:
-        # Links to the authenticated download endpoint, only for files that exist.
         request = self.context.get('request')
         links = {}
         for kind in DOWNLOADABLE_FILES:

@@ -67,7 +67,7 @@ def run_ffmpeg(arguments, duration=None, on_progress=None):
                 try:
                     seconds = int(value) / 1_000_000
                 except ValueError:
-                    continue 
+                    continue
                 on_progress(seconds / duration)
             elif key not in PROGRESS_KEYS:
                 error_tail.append(line.strip())

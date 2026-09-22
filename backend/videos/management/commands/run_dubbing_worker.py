@@ -1,6 +1,8 @@
+import importlib.util
 import logging
 import sys
 import time
+from pathlib import Path
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
@@ -26,6 +28,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         self._configure_logging()
+        self._warn_duplicate_openmp()
 
         interrupted = fail_interrupted_jobs()
         if interrupted:
@@ -49,6 +52,18 @@ class Command(BaseCommand):
                     time.sleep(options['poll_interval'])
         except KeyboardInterrupt:
             self.stdout.write('\nWorker stopped.')
+
+    def _warn_duplicate_openmp(self):
+        if sys.platform != 'win32':
+            return
+
+        spec = importlib.util.find_spec('ctranslate2')
+        if spec and (Path(spec.origin).parent / 'libiomp5md.dll').exists():
+            self.stdout.write(self.style.WARNING(
+                'ctranslate2 ships its own libiomp5md.dll next to the one in torch. Two OpenMP '
+                'runtimes in one process crash the worker at random. Rename '
+                f'{Path(spec.origin).parent / "libiomp5md.dll"} to libiomp5md.dll.bak.'
+            ))
 
     def _configure_logging(self):
         logger = logging.getLogger('videos.pipeline')

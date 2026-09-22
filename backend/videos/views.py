@@ -1,25 +1,34 @@
 from pathlib import Path
 
-from django.http import FileResponse, Http404
+from django.http import FileResponse, Http404, HttpResponse
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from Auth.serializers import MessageSerializer
 from videos.languages import SOURCE_LANGUAGES
-from videos.models import DubbingJob
+from videos.models import DubbingJob, Segment
 from videos.pipeline.workspace import JobWorkspace
 from videos.serializers import (
     DOWNLOADABLE_FILES,
     DubbingJobCreateSerializer,
     DubbingJobSerializer,
+    SegmentSerializer,
     SourceLanguageSerializer,
 )
+from videos.subtitles import build_srt
+
+
+class SegmentPagination(PageNumberPagination):
+    page_size = 100
+    page_size_query_param = 'page_size'
+    max_page_size = 500
 
 
 class LanguageListView(APIView):
@@ -137,8 +146,8 @@ class JobRetryView(APIView):
 
     @extend_schema(
         tags=['Video Dubbing'],
-        summary='Queue a failed or cancelled job again',
-        description='Stages whose output is already on disk are skipped, so a retry resumes where the job stopped.',
+        summary='Queue a finished, failed or cancelled job again',
+        description='Stages whose output is already on disk are skipped, so a retry resumes where the job stopped or runs stages added since it finished.',
         request=None,
         responses={200: DubbingJobSerializer, 400: MessageSerializer},
     )
@@ -147,7 +156,11 @@ class JobRetryView(APIView):
 
         requeued = DubbingJob.objects.filter(
             pk=job.pk,
-            status__in=[DubbingJob.Status.FAILED, DubbingJob.Status.CANCELLED],
+            status__in=[
+                DubbingJob.Status.COMPLETED,
+                DubbingJob.Status.FAILED,
+                DubbingJob.Status.CANCELLED,
+            ],
         ).update(
             status=DubbingJob.Status.QUEUED,
             stage=DubbingJob.Stage.PENDING,
@@ -191,3 +204,42 @@ class JobFileView(APIView):
             as_attachment=True,
             filename=f'job_{job.pk}_{kind}{Path(path).suffix}',
         )
+
+
+class JobSegmentListView(APIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = SegmentSerializer
+    pagination_class = SegmentPagination
+
+    @extend_schema(
+        tags=['Video Dubbing'],
+        summary='List the transcript segments of a job',
+        responses={200: SegmentSerializer(many=True)},
+    )
+    def get(self, request, job_id):
+        job = get_object_or_404(DubbingJob, id=job_id, owner=request.user)
+        segments = Segment.objects.filter(job=job)
+
+        paginator = self.pagination_class()
+        page = paginator.paginate_queryset(segments, request, view=self)
+        serializer = self.serializer_class(page, many=True)
+        return paginator.get_paginated_response(serializer.data)
+
+
+class JobTranscriptView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        tags=['Video Dubbing'],
+        summary='Download the transcript as an SRT subtitle file',
+        responses={(200, 'application/x-subrip'): OpenApiTypes.STR},
+    )
+    def get(self, request, job_id):
+        job = get_object_or_404(DubbingJob, id=job_id, owner=request.user)
+        segments = Segment.objects.filter(job=job)
+        if not segments.exists():
+            raise Http404('This job has no transcript yet.')
+
+        response = HttpResponse(build_srt(segments), content_type='application/x-subrip; charset=utf-8')
+        response['Content-Disposition'] = f'attachment; filename="job_{job.pk}_transcript.srt"'
+        return response

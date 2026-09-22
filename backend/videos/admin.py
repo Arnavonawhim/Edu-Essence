@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from videos.models import DubbingJob
+from videos.models import DubbingJob, Segment
 
 
 @admin.register(DubbingJob)
@@ -14,10 +14,23 @@ class DubbingJobAdmin(admin.ModelAdmin):
         'uploader',
         'duration_seconds',
         'detected_language',
+        'language_probability',
+        'asr_model',
+        'word_aligned',
+        'transcribed_until',
         'progress',
         'progress_message',
         'error_message',
         'stage_timings',
         'created_at',
         'started_at',
-        'finished_at',]
+        'finished_at',
+    ]
+
+
+@admin.register(Segment)
+class SegmentAdmin(admin.ModelAdmin):
+    list_display = ['id', 'job', 'index', 'start', 'end', 'text', 'confidence']
+    list_filter = ['job']
+    search_fields = ['text']
+    readonly_fields = ['words']
