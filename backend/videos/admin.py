@@ -18,6 +18,7 @@ class DubbingJobAdmin(admin.ModelAdmin):
         'asr_model',
         'word_aligned',
         'transcribed_until',
+        'translation_model',
         'progress',
         'progress_message',
         'error_message',
@@ -30,7 +31,7 @@ class DubbingJobAdmin(admin.ModelAdmin):
 
 @admin.register(Segment)
 class SegmentAdmin(admin.ModelAdmin):
-    list_display = ['id', 'job', 'index', 'start', 'end', 'text', 'confidence']
+    list_display = ['id', 'job', 'index', 'start', 'end', 'text', 'translated_text', 'confidence']
     list_filter = ['job']
-    search_fields = ['text']
+    search_fields = ['text', 'translated_text']
     readonly_fields = ['words']

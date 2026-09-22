@@ -3,6 +3,7 @@ import shutil
 import subprocess
 from collections import deque
 
+import numpy as np
 from django.conf import settings
 
 from videos.pipeline.exceptions import PipelineError
@@ -37,6 +38,26 @@ def probe_duration(path):
         return float(json.loads(result.stdout)['format']['duration'])
     except (KeyError, ValueError) as error:
         raise PipelineError(f'ffprobe returned no duration for {path.name}.') from error
+
+
+def encode_flac(samples, sample_rate=16000):
+    pcm = (np.clip(samples, -1.0, 1.0) * 32767).astype('<i2').tobytes()
+    command = [
+        settings.FFMPEG_BINARY,
+        '-hide_banner',
+        '-loglevel', 'error',
+        '-f', 's16le',
+        '-ar', str(sample_rate),
+        '-ac', '1',
+        '-i', 'pipe:0',
+        '-c:a', 'flac',
+        '-f', 'flac',
+        'pipe:1',
+    ]
+    result = subprocess.run(command, input=pcm, capture_output=True)
+    if result.returncode != 0:
+        raise PipelineError(f'ffmpeg could not encode FLAC: {result.stderr.decode(errors="replace").strip()}')
+    return result.stdout
 
 
 def run_ffmpeg(arguments, duration=None, on_progress=None):

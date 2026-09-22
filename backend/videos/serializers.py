@@ -85,6 +85,7 @@ class SegmentSerializer(serializers.ModelSerializer):
             'end',
             'duration',
             'text',
+            'translated_text',
             'confidence',
             'words',
         ]
@@ -94,6 +95,7 @@ class SegmentSerializer(serializers.ModelSerializer):
 class DubbingJobSerializer(serializers.ModelSerializer):
     processing_seconds = serializers.FloatField(read_only=True, allow_null=True)
     segment_count = serializers.IntegerField(read_only=True, source='segments.count')
+    translated_count = serializers.SerializerMethodField()
     files = serializers.SerializerMethodField()
 
     class Meta:
@@ -112,6 +114,8 @@ class DubbingJobSerializer(serializers.ModelSerializer):
             'word_aligned',
             'transcribed_until',
             'segment_count',
+            'translation_model',
+            'translated_count',
             'diarize',
             'clone_voices',
             'min_speakers',
@@ -129,6 +133,9 @@ class DubbingJobSerializer(serializers.ModelSerializer):
             'finished_at',
         ]
         read_only_fields = fields
+
+    def get_translated_count(self, job) -> int:
+        return job.segments.exclude(translated_text='').count()
 
     def get_files(self, job) -> dict:
         request = self.context.get('request')

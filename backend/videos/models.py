@@ -55,6 +55,7 @@ class DubbingJob(models.Model):
     asr_model = models.CharField(max_length=50, blank=True)
     word_aligned = models.BooleanField(default=False)
     transcribed_until = models.FloatField(default=0)
+    translation_model = models.CharField(max_length=100, blank=True)
 
     stage_timings = models.JSONField(default=dict, blank=True)
 
@@ -103,6 +104,7 @@ class Segment(models.Model):
     text = models.TextField()
     words = models.JSONField(default=list, blank=True)
     confidence = models.FloatField(null=True, blank=True)
+    translated_text = models.TextField(blank=True)
 
     class Meta:
         db_table = 'dubbing_segments'

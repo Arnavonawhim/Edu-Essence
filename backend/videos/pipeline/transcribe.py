@@ -4,20 +4,16 @@ import numpy as np
 import whisperx
 from django.conf import settings
 from django.db import transaction
-from whisperx.audio import N_SAMPLES, SAMPLE_RATE, log_mel_spectrogram
+from whisperx.audio import N_SAMPLES, SAMPLE_RATE
 
 from videos.languages import SOURCE_LANGUAGES, is_supported
 from videos.models import Segment
 from videos.pipeline import model_cache
 from videos.pipeline.audio import load_speech
 from videos.pipeline.exceptions import PipelineError
+from videos.pipeline.recognizers import get_recognizer
 from videos.pipeline.segmentation import build_segments
 from videos.pipeline.workspace import JobWorkspace
-
-ASR_OPTIONS = {
-    'beam_size': 5,
-    'condition_on_previous_text': False,
-}
 
 DETECTION_WINDOWS = 6
 DETECTION_MIN_RMS = 0.01
@@ -42,8 +38,12 @@ def transcribe_speech(job, workspace, reporter):
         return
 
     device = model_cache.resolve_device()
-    language = resolve_language(job, audio, device, reporter)
-    drafts = draft_windows(job, workspace, audio, pending, language, device, reporter)
+    recognizer = get_recognizer(device)
+    job.asr_model = recognizer.name
+    job.save(update_fields=['asr_model'])
+
+    language = resolve_language(job, recognizer, audio, reporter)
+    drafts = draft_windows(workspace, recognizer, audio, pending, language, reporter)
 
     if not settings.DUBBING_KEEP_MODELS_LOADED:
         model_cache.release()
@@ -75,23 +75,18 @@ def transcribe_speech(job, workspace, reporter):
     reporter.log(f'{next_index} segments transcribed in {SOURCE_LANGUAGES[language]["name"]}')
 
 
-def draft_windows(job, workspace, audio, pending, language, device, reporter):
+def draft_windows(workspace, recognizer, audio, pending, language, reporter):
     total = len(audio) / SAMPLE_RATE
     drafts = []
 
-    for start, end in pending:
+    for number, (start, end) in enumerate(pending, start=1):
         path = workspace.draft_path(start)
         if path.exists():
             drafts.append(json.loads(path.read_text(encoding='utf-8')))
             continue
 
-        model = load_whisper(device)
-        raw_segments = model.transcribe(
-            audio_slice(audio, start, end),
-            batch_size=settings.DUBBING_WHISPER_BATCH_SIZE,
-            language=language,
-            task='transcribe',
-        )['segments']
+        reporter.log(f'Transcribing {clock(start)}-{clock(end)} (window {number} of {len(pending)}) with {recognizer.name}')
+        raw_segments = recognizer.transcribe(audio_slice(audio, start, end), language)
 
         partial = path.with_suffix('.partial')
         partial.write_text(json.dumps(raw_segments, ensure_ascii=False, default=float), encoding='utf-8')
@@ -101,20 +96,6 @@ def draft_windows(job, workspace, audio, pending, language, device, reporter):
         reporter.update(DRAFT_SHARE * end / total, f'Transcribed {clock(end)} of {clock(total)}')
 
     return drafts
-
-
-def load_whisper(device):
-    compute_type = settings.DUBBING_WHISPER_COMPUTE_TYPE or ('float16' if device == 'cuda' else 'int8')
-    key = ('whisper', settings.DUBBING_WHISPER_MODEL, device, compute_type)
-    return model_cache.load(
-        key,
-        lambda: whisperx.load_model(
-            settings.DUBBING_WHISPER_MODEL,
-            device,
-            compute_type=compute_type,
-            asr_options=ASR_OPTIONS,
-        ),
-    )
 
 
 def load_aligner(job, language, device, reporter):
@@ -127,15 +108,15 @@ def load_aligner(job, language, device, reporter):
         reporter.log(f'No alignment model for "{language}"; word timings will be estimated')
         aligner = None
 
-    job.asr_model = settings.DUBBING_WHISPER_MODEL
     job.word_aligned = aligner is not None
-    job.save(update_fields=['asr_model', 'word_aligned'])
+    job.save(update_fields=['word_aligned'])
     return aligner
 
 
-def resolve_language(job, audio, device, reporter):
+def resolve_language(job, recognizer, audio, reporter):
     if not job.detected_language:
-        detected, probability = detect_language(load_whisper(device), audio)
+        reporter.log(f'Detecting the spoken language with {recognizer.name}')
+        detected, probability = detect_language(recognizer, audio)
         job.detected_language = detected
         job.language_probability = round(probability, 3)
         job.save(update_fields=['detected_language', 'language_probability'])
@@ -158,7 +139,7 @@ def resolve_language(job, audio, device, reporter):
     return detected
 
 
-def detect_language(model, audio):
+def detect_language(recognizer, audio):
     if len(audio) <= N_SAMPLES:
         starts = [0]
     else:
@@ -167,14 +148,13 @@ def detect_language(model, audio):
     windows = [audio[start:start + N_SAMPLES] for start in starts]
     voiced = [window for window in windows if rms(window) >= DETECTION_MIN_RMS] or windows
 
-    n_mels = model.model.feat_kwargs.get('feature_size') or 80
     totals = {}
     for window in voiced:
-        features = log_mel_spectrogram(window, n_mels=n_mels, padding=N_SAMPLES - len(window))
-        encoder_output = model.model.encode(features)
-        for token, probability in model.model.model.detect_language(encoder_output)[0]:
-            code = token[2:-2]
+        for code, probability in recognizer.language_scores(window).items():
             totals[code] = totals.get(code, 0.0) + probability
+
+    if not totals:
+        raise PipelineError('Could not detect the spoken language. Set source_language on the job.')
 
     language = max(totals, key=totals.get)
     return language, totals[language] / len(voiced)

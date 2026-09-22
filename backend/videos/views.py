@@ -4,7 +4,7 @@ from django.http import FileResponse, Http404, HttpResponse
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from drf_spectacular.types import OpenApiTypes
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import status
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
@@ -23,6 +23,12 @@ from videos.serializers import (
     SourceLanguageSerializer,
 )
 from videos.subtitles import build_srt
+
+
+TRANSCRIPT_TRACKS = {
+    'original': 'text',
+    'english': 'translated_text',
+}
 
 
 class SegmentPagination(PageNumberPagination):
@@ -231,15 +237,23 @@ class JobTranscriptView(APIView):
 
     @extend_schema(
         tags=['Video Dubbing'],
-        summary='Download the transcript as an SRT subtitle file',
+        summary='Download the transcript or its English translation as an SRT file',
+        parameters=[
+            OpenApiParameter('track', str, enum=['original', 'english'], description='Defaults to original.'),
+        ],
         responses={(200, 'application/x-subrip'): OpenApiTypes.STR},
     )
     def get(self, request, job_id):
         job = get_object_or_404(DubbingJob, id=job_id, owner=request.user)
-        segments = Segment.objects.filter(job=job)
-        if not segments.exists():
-            raise Http404('This job has no transcript yet.')
+        track = request.query_params.get('track', 'original')
+        if track not in TRANSCRIPT_TRACKS:
+            raise Http404('Unknown track.')
 
-        response = HttpResponse(build_srt(segments), content_type='application/x-subrip; charset=utf-8')
-        response['Content-Disposition'] = f'attachment; filename="job_{job.pk}_transcript.srt"'
+        field = TRANSCRIPT_TRACKS[track]
+        segments = Segment.objects.filter(job=job).exclude(**{field: ''})
+        if not segments.exists():
+            raise Http404(f'This job has no {track} transcript yet.')
+
+        response = HttpResponse(build_srt(segments, field=field), content_type='application/x-subrip; charset=utf-8')
+        response['Content-Disposition'] = f'attachment; filename="job_{job.pk}_{track}.srt"'
         return response

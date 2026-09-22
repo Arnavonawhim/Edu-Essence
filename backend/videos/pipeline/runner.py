@@ -12,6 +12,7 @@ from videos.pipeline.exceptions import JobCancelled, PipelineError
 from videos.pipeline.ffmpeg import require_binaries
 from videos.pipeline.progress import ProgressReporter
 from videos.pipeline.transcribe import transcribe_speech
+from videos.pipeline.translate import translate_segments
 from videos.pipeline.workspace import JobWorkspace
 
 logger = logging.getLogger('videos.pipeline')
@@ -21,6 +22,7 @@ PIPELINE = [
     (Stage.DOWNLOAD, download_video, 15),
     (Stage.EXTRACT_AUDIO, extract_speech_audio, 5),
     (Stage.TRANSCRIBE, transcribe_speech, 35),
+    (Stage.TRANSLATE, translate_segments, 15),
 ]
 
 
