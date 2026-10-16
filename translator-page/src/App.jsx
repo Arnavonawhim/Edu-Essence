@@ -2,6 +2,14 @@ import React, { useState, useEffect, useRef } from 'react';
 
 const API_BASE_URL = 'https://edu-essence.onrender.com';
 
+<<<<<<< HEAD
+=======
+/* On the unified deploy the static site is this same origin's root. Running the
+   translator's own vite server (:5173) it lives on the react-sample server. */
+const HOME_URL =
+  window.location.port === '5173' ? 'http://localhost:5175/' : '/';
+
+>>>>>>> origin/test
 export default function App() {
   // 1. Immediately read and save token BEFORE hooks execute
   const [token, setToken] = useState(() => {
@@ -30,8 +38,11 @@ export default function App() {
   const [translatedTranscript, setTranslatedTranscript] = useState('');
 
   const recognitionRef = useRef(null);
+<<<<<<< HEAD
   const audioRef = useRef(null);
   const audioUnlockedRef = useRef(false);
+=======
+>>>>>>> origin/test
 
   // Helper for authenticated headers
   const getAuthHeaders = () => {
@@ -148,6 +159,7 @@ export default function App() {
   };
 
   // 4. Synthesise Speech / Audio Output (Base64 audio response)
+<<<<<<< HEAD
     const playTranslatedAudio = async (textToSpeak) => {
     // Stop anything currently playing before starting new audio
     if (audioRef.current) {
@@ -156,6 +168,9 @@ export default function App() {
     }
     window.speechSynthesis?.cancel();
 
+=======
+  const playTranslatedAudio = async (textToSpeak) => {
+>>>>>>> origin/test
     try {
       const res = await fetch(`${API_BASE_URL}/api/translation/speech/`, {
         method: 'POST',
@@ -168,6 +183,7 @@ export default function App() {
 
       if (res.ok) {
         const data = await res.json();
+<<<<<<< HEAD
         let audioSrc = null;
 
         if (data.audio_base64) {
@@ -188,10 +204,17 @@ export default function App() {
             console.warn('Autoplay blocked, falling back to browser speech:', err);
             speakWithBrowserVoice(textToSpeak);
           });
+=======
+        if (data.audio_base64) {
+          const format = data.audio_format || 'mp3';
+          const audio = new Audio(`data:audio/${format};base64,${data.audio_base64}`);
+          audio.play();
+>>>>>>> origin/test
           return;
         }
       }
     } catch (err) {
+<<<<<<< HEAD
       console.warn('Speech API failed, using browser voice fallback:', err);
     }
 
@@ -199,6 +222,11 @@ export default function App() {
   };
 
   const speakWithBrowserVoice = (textToSpeak) => {
+=======
+      // Web Speech fallback
+    }
+
+>>>>>>> origin/test
     if ('speechSynthesis' in window && !isSpeakerMuted) {
       window.speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(textToSpeak);
@@ -258,6 +286,7 @@ export default function App() {
   }, [selectedLanguage, isSpeakerMuted]);
 
   // Handle Mute Button toggle
+<<<<<<< HEAD
     const toggleMic = () => {
     if (isMicMuted) {
       setIsMicMuted(false);
@@ -266,6 +295,11 @@ export default function App() {
         unlock.play().catch(() => {});
         audioUnlockedRef.current = true;
       }
+=======
+  const toggleMic = () => {
+    if (isMicMuted) {
+      setIsMicMuted(false);
+>>>>>>> origin/test
       try {
         recognitionRef.current?.start();
       } catch (_) {}
@@ -278,6 +312,7 @@ export default function App() {
   };
 
   // Handle Speaker Button toggle
+<<<<<<< HEAD
     const toggleSpeaker = () => {
     if (!isSpeakerMuted) {
       // Turning speaker OFF — stop everything immediately
@@ -296,13 +331,26 @@ export default function App() {
     }
     setIsSpeakerMuted(!isSpeakerMuted);
   };
+=======
+  const toggleSpeaker = () => {
+    if (!isSpeakerMuted) {
+      window.speechSynthesis?.cancel();
+    }
+    setIsSpeakerMuted(!isSpeakerMuted);
+  };
+
+>>>>>>> origin/test
   return (
     <div className="min-h-screen w-full flex flex-col bg-[#EBE1C6] text-[#1F1B24] font-serif selection:bg-[#C7B4D8]">
       {/* Top Navbar */}
       <header className="px-6 md:px-12 py-4 border-b border-[#C7B4D8]/60 flex items-center justify-between bg-[#EBE1C6]">
         <div className="flex items-center gap-6">
           <a
+<<<<<<< HEAD
             href="http://127.0.0.1:5500/Edu-frontend/index.html"
+=======
+            href={HOME_URL}
+>>>>>>> origin/test
             className="text-sm italic text-[#1F1B24] hover:opacity-75 transition-opacity flex items-center gap-1.5"
           >
             <span>&larr;</span> Back to Home

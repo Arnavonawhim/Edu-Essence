@@ -11,3 +11,12 @@ requests==2.33.1
 python-dotenv==1.2.2
 gTTS==2.5.4
 PyJWT==2.10.1
+<<<<<<< HEAD
+=======
+yt-dlp[default]
+whisperx>=3.4
+sentencepiece
+sacremoses
+indic-nlp-library-itt
+regex
+>>>>>>> origin/test

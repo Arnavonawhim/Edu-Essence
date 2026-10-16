@@ -81,6 +81,10 @@ INSTALLED_APPS = [
     'Auth',
     'Translation',
     'Classroom',
+<<<<<<< HEAD
+=======
+    'videos',
+>>>>>>> origin/test
 ]
 
 AUTH_USER_MODEL = 'user_auth.User'
@@ -133,6 +137,36 @@ LIVEKIT_TOKEN_TTL = int(os.environ.get('LIVEKIT_TOKEN_TTL', '21600'))
 
 CLASS_STREAM_PAGE_SIZE = int(os.environ.get('CLASS_STREAM_PAGE_SIZE', '20'))
 
+<<<<<<< HEAD
+=======
+FFMPEG_BINARY = os.environ.get('FFMPEG_BINARY', 'ffmpeg')
+FFPROBE_BINARY = os.environ.get('FFPROBE_BINARY', 'ffprobe')
+DUBBING_MAX_VIDEO_HEIGHT = int(os.environ.get('DUBBING_MAX_VIDEO_HEIGHT', '1080'))
+DUBBING_MAX_DURATION_SECONDS = int(os.environ.get('DUBBING_MAX_DURATION_SECONDS', str(3 * 60 * 60)))
+DUBBING_WORKER_POLL_SECONDS = float(os.environ.get('DUBBING_WORKER_POLL_SECONDS', '5'))
+DUBBING_PROGRESS_INTERVAL_SECONDS = float(os.environ.get('DUBBING_PROGRESS_INTERVAL_SECONDS', '2'))
+DUBBING_DEVICE = os.environ.get('DUBBING_DEVICE', 'auto')
+DUBBING_KEEP_MODELS_LOADED = os.environ.get('DUBBING_KEEP_MODELS_LOADED', 'False') == 'True'
+DUBBING_WHISPER_MODEL = os.environ.get('DUBBING_WHISPER_MODEL', 'large-v3')
+DUBBING_WHISPER_COMPUTE_TYPE = os.environ.get('DUBBING_WHISPER_COMPUTE_TYPE', '')
+DUBBING_WHISPER_BATCH_SIZE = int(os.environ.get('DUBBING_WHISPER_BATCH_SIZE', '16'))
+DUBBING_TRANSCRIBE_WINDOW_SECONDS = int(os.environ.get('DUBBING_TRANSCRIBE_WINDOW_SECONDS', '600'))
+DUBBING_MAX_SEGMENT_SECONDS = float(os.environ.get('DUBBING_MAX_SEGMENT_SECONDS', '12'))
+DUBBING_MIN_SEGMENT_SECONDS = float(os.environ.get('DUBBING_MIN_SEGMENT_SECONDS', '1'))
+DUBBING_ASR_PROVIDER = os.environ.get('DUBBING_ASR_PROVIDER', 'whisperx')
+DUBBING_GROQ_ASR_MODEL = os.environ.get('DUBBING_GROQ_ASR_MODEL', 'whisper-large-v3')
+DUBBING_GROQ_TIMEOUT = int(os.environ.get('DUBBING_GROQ_TIMEOUT', '180'))
+
+HF_TOKEN = os.environ.get('HF_TOKEN', '')
+DUBBING_INDICTRANS2_MODEL = os.environ.get('DUBBING_INDICTRANS2_MODEL', 'ai4bharat/indictrans2-indic-en-1B')
+DUBBING_NLLB_MODEL = os.environ.get('DUBBING_NLLB_MODEL', 'facebook/nllb-200-3.3B')
+DUBBING_TRANSLATION_BATCH_SIZE = int(os.environ.get('DUBBING_TRANSLATION_BATCH_SIZE', '8'))
+DUBBING_TRANSLATION_BEAMS = int(os.environ.get('DUBBING_TRANSLATION_BEAMS', '5'))
+DUBBING_TRANSLATION_CANDIDATES = int(os.environ.get('DUBBING_TRANSLATION_CANDIDATES', '4'))
+DUBBING_TRANSLATION_SCORE_TOLERANCE = float(os.environ.get('DUBBING_TRANSLATION_SCORE_TOLERANCE', '0.1'))
+DUBBING_ENGLISH_CHARS_PER_SECOND = float(os.environ.get('DUBBING_ENGLISH_CHARS_PER_SECOND', '15'))
+
+>>>>>>> origin/test
 PROVIDER_TIMEOUT = int(os.environ.get('PROVIDER_TIMEOUT', '20'))
 MAX_UTTERANCE_BYTES = int(os.environ.get('MAX_UTTERANCE_BYTES', str(6 * 1024 * 1024)))
 
@@ -152,6 +186,11 @@ SPECTACULAR_SETTINGS = {
         'SessionStatusEnum': 'Translation.models.SESSION_STATUS_CHOICES',
         'SessionModeEnum': 'Translation.models.SESSION_MODE_CHOICES',
         'ClassStatusEnum': 'Classroom.models.CLASS_STATUS_CHOICES',
+<<<<<<< HEAD
+=======
+        'DubbingJobStatusEnum': 'videos.models.JOB_STATUS_CHOICES',
+        'DubbingJobStageEnum': 'videos.models.JOB_STAGE_CHOICES',
+>>>>>>> origin/test
     },
 }
 
@@ -199,6 +238,14 @@ DATABASES = {
 
 DATABASES['default']['CONN_HEALTH_CHECKS'] = True
 
+<<<<<<< HEAD
+=======
+# The dubbing worker writes progress while the API reads it. On SQLite that
+# means two processes on one file, so wait for the lock instead of failing.
+if DATABASES['default']['ENGINE'] == 'django.db.backends.sqlite3':
+    DATABASES['default'].setdefault('OPTIONS', {})['timeout'] = 20
+
+>>>>>>> origin/test
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -237,6 +284,12 @@ USE_TZ = True
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
+<<<<<<< HEAD
+=======
+MEDIA_URL = 'media/'
+MEDIA_ROOT = Path(os.environ.get('MEDIA_ROOT', BASE_DIR / 'media'))
+
+>>>>>>> origin/test
 STORAGES = {
     'default': {
         'BACKEND': 'django.core.files.storage.FileSystemStorage',
