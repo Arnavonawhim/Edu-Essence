@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create Account — Edu-Essence</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Plus+Jakarta+Sans:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="login.css" />
+</head>
+<body>
+
+  <main class="auth-wrapper">
+    <div class="auth-card">
+      
+      <header class="auth-header">
+        <h1 class="brand-title">Edu-Essence</h1>
+        <p class="brand-subtitle">Begin your academic journey</p>
+      </header>
+
+      <form id="registerForm" novalidate>
+        <!-- Name Row -->
+        <div class="name-grid">
+          <!-- First Name -->
+          <div class="form-group">
+            <label for="firstName">First Name <span class="required-star">*</span></label>
+            <div class="input-wrapper">
+              <input 
+                type="text" 
+                id="firstName" 
+                name="firstName" 
+                placeholder="John" 
+                autocomplete="given-name"
+                required 
+              />
+            </div>
+            <span class="field-error" id="firstNameError"></span>
+          </div>
+
+          <!-- Last Name (No constraint symbol) -->
+          <div class="form-group">
+            <label for="lastName">Last Name</label>
+            <div class="input-wrapper">
+              <input 
+                type="text" 
+                id="lastName" 
+                name="lastName" 
+                placeholder="Doe" 
+                autocomplete="family-name"
+              />
+            </div>
+            <span class="field-error" id="lastNameError"></span>
+          </div>
+        </div>
+
+        <!-- Email Field -->
+        <div class="form-group">
+          <label for="email">Email <span class="required-star">*</span></label>
+          <div class="input-wrapper">
+            <input 
+              type="email" 
+              id="email" 
+              name="email" 
+              placeholder="name@example.com" 
+              autocomplete="email"
+              required 
+            />
+          </div>
+          <span class="field-error" id="emailError"></span>
+        </div>
+
+        <!-- Password Field -->
+        <div class="form-group">
+          <label for="password">Password <span class="required-star">*</span></label>
+          <div class="input-wrapper">
+            <input 
+              type="password" 
+              id="password" 
+              name="password" 
+              placeholder="At least 8 characters" 
+              autocomplete="new-password"
+              required 
+            />
+            <button type="button" id="togglePassword" class="password-toggle-btn" aria-label="Toggle password visibility">
+              Show
+            </button>
+          </div>
+          <span class="field-error" id="passwordError"></span>
+        </div>
+
+        <!-- Confirm Password Field -->
+        <div class="form-group">
+          <label for="confirmPassword">Confirm Password <span class="required-star">*</span></label>
+          <div class="input-wrapper">
+            <input 
+              type="password" 
+              id="confirmPassword" 
+              name="confirmPassword" 
+              placeholder="Re-enter password" 
+              autocomplete="new-password"
+              required 
+            />
+            <button type="button" id="toggleConfirmPassword" class="password-toggle-btn" aria-label="Toggle confirm password visibility">
+              Show
+            </button>
+          </div>
+          <span class="field-error" id="confirmPasswordError"></span>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" id="registerSubmitBtn" class="btn-submit">
+          Create Account
+        </button>
+      </form>
+
+      <footer class="auth-footer">
+        <p>Already have an account? <a href="login.html">Login</a></p>
+      </footer>
+
+    </div>
+  </main>
+
+  <script src="register.js"></script>
+</body>
+</html>

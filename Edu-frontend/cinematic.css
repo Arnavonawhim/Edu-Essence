@@ -1,0 +1,326 @@
+.cine {
+  --beats: 4;
+  --stage-ink: #17140F;
+  position: relative;
+  background: var(--stage-ink);
+}
+
+.cine-pin {
+  position: relative;
+  overflow: hidden;
+  background: var(--stage-ink);
+}
+
+.cine-media {
+  position: absolute;
+  inset: 0;
+}
+
+.cine-layer {
+  position: absolute;
+  inset: -3%;
+  margin: 0;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  filter: saturate(1.06) contrast(1.02) blur(2px);
+  transform-origin: 58% 55%;
+  will-change: opacity, transform;
+}
+
+.cine-scrim {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(100deg, rgba(23,20,15,0.94) 0%, rgba(23,20,15,0.82) 34%, rgba(23,20,15,0.42) 62%, rgba(23,20,15,0.55) 100%),
+    linear-gradient(to top, rgba(23,20,15,0.9) 0%, rgba(23,20,15,0.1) 45%);
+}
+
+.cine-vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(120% 90% at 62% 45%, transparent 30%, rgba(23,20,15,0.6) 100%);
+  mix-blend-mode: multiply;
+}
+
+.cine-inner {
+  position: relative;
+  z-index: 3;
+  max-width: 80rem;
+  margin: 0 auto;
+  width: 100%;
+  padding: 7rem 1.5rem 5.5rem;
+  display: grid;
+  gap: 2.5rem;
+  align-items: center;
+}
+
+.cine-copy-stack {
+  position: relative;
+  min-height: clamp(360px, 46vh, 480px);
+}
+
+.cine-beat {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  will-change: opacity, transform;
+}
+
+.cine-index {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: rgba(255, 248, 211, 0.78);
+  background: rgba(199, 180, 216, 0.18);
+  border: 1px solid rgba(255, 248, 211, 0.18);
+  padding: 0.42rem 0.9rem;
+  border-radius: 999px;
+}
+
+.cine-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 300;
+  font-size: clamp(2rem, 4.4vw, 3.5rem);
+  line-height: 1.05;
+  letter-spacing: -0.032em;
+  color: #FFF8D3;
+  margin-top: 1.4rem;
+  max-width: 17ch;
+  text-wrap: balance;
+}
+
+.cine-title em {
+  font-style: italic;
+  font-weight: 500;
+  color: #D9C4EC;
+}
+
+.cine-body {
+  margin-top: 1.15rem;
+  max-width: 44ch;
+  font-size: clamp(0.95rem, 1.1vw, 1.06rem);
+  line-height: 1.7;
+  color: rgba(255, 248, 211, 0.72);
+}
+
+.cine-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1.6rem;
+}
+
+.cine-tag {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: rgba(255, 248, 211, 0.66);
+  border: 1px solid rgba(255, 248, 211, 0.16);
+  border-radius: 999px;
+  padding: 0.35rem 0.8rem;
+}
+
+/* ---------- 3D teacher stage ---------- */
+/* Bottom-anchored band half the pin's height. The figure inside is twice that
+   tall, so the band shows only the model's upper body and the waist is cut by
+   the bottom edge of the section. */
+.cine-stage {
+  position: absolute;
+  z-index: 2;
+  right: 0;
+  bottom: 0;
+  height: 50%;
+  width: min(34%, 28rem);
+  overflow: hidden;
+  transform-origin: 50% 100%;
+  will-change: transform;
+  pointer-events: none;
+}
+
+.cine-stage-figure {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 200%;
+  pointer-events: auto;
+}
+
+.cine-stage-figure model-viewer,
+.cine-stage-figure iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: transparent;
+}
+
+.cine-stage-placeholder {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.cine-stage-placeholder svg {
+  width: 54%;
+  max-width: 11rem;
+  height: auto;
+  opacity: 0.55;
+}
+
+/* ---------- beat rail ---------- */
+.cine-rail {
+  position: absolute;
+  z-index: 3;
+  left: 1.5rem;
+  right: 1.5rem;
+  bottom: 1.75rem;
+  max-width: 80rem;
+  margin: 0 auto;
+  display: flex;
+  gap: 0.85rem;
+  align-items: flex-end;
+}
+
+.cine-tick {
+  flex: 1;
+  text-align: left;
+  padding-top: 0.7rem;
+  border-top: 2px solid rgba(255, 248, 211, 0.18);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: rgba(255, 248, 211, 0.4);
+  transition: color 0.4s var(--ease-out), border-color 0.4s var(--ease-out);
+}
+
+.cine-tick.is-active {
+  color: #FFF8D3;
+  border-top-color: #C7B4D8;
+}
+
+.cine-progress {
+  position: absolute;
+  z-index: 3;
+  inset-inline: 0;
+  bottom: 0;
+  height: 2px;
+  background: #C7B4D8;
+  transform-origin: left center;
+  transform: scaleX(0);
+}
+
+/* ---------- pinned mode (JS + motion allowed) ---------- */
+.js-motion .cine { height: calc(var(--beats) * 100svh); }
+
+.js-motion .cine-pin {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  display: flex;
+  align-items: center;
+}
+
+.js-motion .cine-beat {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.js-motion .cine-beat.is-live { pointer-events: auto; }
+
+/* ---------- static fallback ---------- */
+html:not(.js-motion) .cine-layer:not(:first-child) { opacity: 0; }
+html:not(.js-motion) .cine-copy-stack {
+  display: grid;
+  gap: 3.5rem;
+  min-height: 0;
+}
+
+@media (min-width: 1024px) {
+  .cine-inner {
+    grid-template-columns: 1.05fr 0.95fr;
+    gap: 4rem;
+    padding-inline: 2.5rem;
+  }
+  .cine-rail { left: 2.5rem; right: 2.5rem; }
+}
+
+@media (max-width: 1023px) {
+  .cine-stage { width: min(58%, 22rem); height: 44%; }
+  .cine-layer { filter: saturate(1.06) contrast(1.02) blur(1px); }
+  .cine-scrim {
+    background: linear-gradient(to top, rgba(23, 20, 15, 0.93) 0%, rgba(23, 20, 15, 0.86) 42%, rgba(23, 20, 15, 0.42) 78%, rgba(23, 20, 15, 0.5) 100%);
+  }
+  .cine-stage-placeholder svg { width: 62%; }
+  .cine-inner {
+    padding: 5.75rem 1.5rem 46%;
+    gap: 1.75rem;
+    z-index: 3;
+  }
+  .cine-copy-stack { min-height: clamp(260px, 34vh, 340px); }
+}
+
+@media (max-width: 640px) {
+  .cine-stage { width: 74%; height: 38%; right: -6%; }
+  .cine-inner { padding-bottom: 40%; }
+  .cine-tick { font-size: 0; padding-top: 0.55rem; }
+  .cine-rail { gap: 0.5rem; bottom: 1.25rem; }
+  .cine-body { max-width: 38ch; }
+  .cine-tags { display: none; }
+  .cine-copy-stack { min-height: clamp(300px, 46vh, 400px); }
+}
+
+.cine-label {
+  position: absolute;
+  z-index: 3;
+  top: 6.25rem;
+  left: 1.5rem;
+  right: 1.5rem;
+  max-width: 80rem;
+  margin: 0 auto;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(255, 248, 211, 0.5);
+}
+
+@media (min-width: 1024px) {
+  .cine-label { left: 2.5rem; right: 2.5rem; }
+}
+
+@media (max-width: 1023px) {
+  .cine-label { top: 5.25rem; }
+}
+
+.cine-stage-note {
+  position: absolute;
+  left: 0.75rem;
+  right: 0.75rem;
+  top: 1rem;
+  margin: 0;
+  border-radius: 0.9rem;
+  background: rgba(23, 20, 15, 0.78);
+  border: 1px solid rgba(255, 248, 211, 0.16);
+  padding: 0.7rem 0.85rem;
+  font-size: 12px;
+  line-height: 1.45;
+  color: rgba(255, 248, 211, 0.82);
+  text-align: center;
+}
